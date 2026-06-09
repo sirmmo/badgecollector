@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Run Hugo from Docker. Pinned image; do not install Hugo on the host.
+set -euo pipefail
+
+IMAGE="hugomods/hugo:exts-0.154.5"
+PROJECT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
+DOCKER_ARGS=(
+  --rm
+  --init
+  -v "${PROJECT_DIR}:/src"
+  -w /src
+)
+
+if [ -t 0 ] && [ -t 1 ]; then
+  DOCKER_ARGS+=(-it)
+fi
+
+# `hugo server` needs to bind 0.0.0.0 inside the container and publish 1313.
+if [ "${1:-}" = "server" ]; then
+  DOCKER_ARGS+=(-p "${HUGO_PORT:-1313}:1313")
+  shift
+  exec docker run "${DOCKER_ARGS[@]}" "$IMAGE" hugo server --bind 0.0.0.0 --baseURL "http://localhost:${HUGO_PORT:-1313}/" --appendPort=false "$@"
+fi
+
+exec docker run "${DOCKER_ARGS[@]}" "$IMAGE" hugo "$@"

@@ -1,0 +1,20 @@
+{{ define "main" }}
+<section class="badges-list">
+  <h1>{{ .Title }}</h1>
+  {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
+  <div class="badges-grid">
+    {{ range .Pages.ByTitle }}
+    <a class="badge-card" href="{{ .RelPermalink }}">
+      {{ with .Params.image }}<img src="{{ . | relURL }}" alt="" class="badge-image">{{ end }}
+      <h2>{{ .Params.name | default .Title }}</h2>
+      <p>{{ .Params.description }}</p>
+      {{ with .Params.tags }}
+      <p class="tags">
+        {{ range . }}<span class="tag">{{ . }}</span>{{ end }}
+      </p>
+      {{ end }}
+    </a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

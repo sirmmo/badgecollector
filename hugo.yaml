@@ -1,0 +1,19 @@
+baseURL: https://badges.example/
+languageCode: en-us
+title: Badge Collector
+enableRobotsTXT: true
+
+params:
+  description: Public badges and certifications for third-party apps.
+
+menu:
+  main:
+    - name: Badges
+      pageRef: /badges/
+      weight: 10
+    - name: Clients
+      pageRef: /clients/
+      weight: 20
+
+build:
+  writeStats: false

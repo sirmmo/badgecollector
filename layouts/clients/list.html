@@ -1,0 +1,31 @@
+{{ define "main" }}
+<section class="clients-list">
+  <h1>{{ .Title }}</h1>
+  {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
+  <p>Each registered client can issue badges via the award API. To register, open a pull request adding a YAML file under <code>data/clients/</code>.</p>
+
+  <ul class="client-cards">
+    {{ range $id, $client := site.Data.clients }}
+    <li class="client-card" id="{{ $client.id }}">
+      <h2>{{ $client.name }}</h2>
+      <dl>
+        <dt>Client ID</dt>
+        <dd><code>{{ $client.id }}</code></dd>
+        {{ with $client.homepage }}
+        <dt>Homepage</dt>
+        <dd><a href="{{ . }}" rel="noopener">{{ . }}</a></dd>
+        {{ end }}
+        {{ with $client.created_at }}
+        <dt>Registered</dt>
+        <dd>{{ . }}</dd>
+        {{ end }}
+        {{ if $client.revoked }}
+        <dt>Status</dt>
+        <dd class="revoked">Revoked</dd>
+        {{ end }}
+      </dl>
+    </li>
+    {{ end }}
+  </ul>
+</section>
+{{ end }}

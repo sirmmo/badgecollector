@@ -1,0 +1,134 @@
+name: Award a badge
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  process:
+    if: contains(github.event.issue.labels.*.name, 'badge-award')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check author association
+        id: gate
+        env:
+          ASSOC: ${{ github.event.issue.author_association }}
+        run: |
+          case "$ASSOC" in
+            OWNER|MEMBER|COLLABORATOR)
+              echo "allowed=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "allowed=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+      - name: Comment when blocked
+        if: steps.gate.outputs.allowed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `This issue must be opened or labelled by a repository collaborator before the award is committed. A maintainer will review and re-label \`badge-award\` if appropriate.`,
+            });
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.allowed == 'true'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write issue body to file
+        if: steps.gate.outputs.allowed == 'true'
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          mkdir -p .tmp
+          printf '%s' "$ISSUE_BODY" > .tmp/issue-body.md
+
+      - name: Parse and apply award
+        if: steps.gate.outputs.allowed == 'true'
+        id: apply
+        env:
+          ISSUE_BODY_PATH: .tmp/issue-body.md
+          REPO_ROOT: ${{ github.workspace }}
+          GITHUB_ACTOR: ${{ github.event.issue.user.login }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          OUTPUT="$(node .github/scripts/award-badge.mjs)"
+          echo "$OUTPUT"
+          echo "result<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on failure
+        if: steps.gate.outputs.allowed == 'true' && fromJSON(steps.apply.outputs.result).ok == false
+        uses: actions/github-script@v7
+        env:
+          RESULT: ${{ steps.apply.outputs.result }}
+        with:
+          script: |
+            const result = JSON.parse(process.env.RESULT);
+            const errors = (result.errors || []).map(e => `- ${e}`).join("\n");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Cannot apply award:\n\n${errors}\n\nEdit the issue to fix and the workflow will retry.`,
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["invalid"],
+            });
+
+      - name: Commit award
+        if: steps.gate.outputs.allowed == 'true' && fromJSON(steps.apply.outputs.result).ok == true
+        env:
+          RESULT: ${{ steps.apply.outputs.result }}
+        run: |
+          PATH_TO_COMMIT="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).path))')"
+          DUPLICATE="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(String(JSON.parse(d.toString()).duplicate)))')"
+          if [ "$DUPLICATE" = "true" ]; then
+            echo "Duplicate award, no commit needed."
+            exit 0
+          fi
+          BADGE_ID="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).badge_id))')"
+          HASH="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).user_id_hash))')"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$PATH_TO_COMMIT"
+          git commit -m "Award ${BADGE_ID} to ${HASH:0:12}... (manual)" -m "From issue #${{ github.event.issue.number }}"
+          git push
+
+      - name: Comment on success and close
+        if: steps.gate.outputs.allowed == 'true' && fromJSON(steps.apply.outputs.result).ok == true
+        uses: actions/github-script@v7
+        env:
+          RESULT: ${{ steps.apply.outputs.result }}
+        with:
+          script: |
+            const result = JSON.parse(process.env.RESULT);
+            const expiry = result.expires_at ? ` (expires ${result.expires_at})` : "";
+            const note = result.duplicate
+              ? `Already awarded — nothing to do.`
+              : `Awarded **${result.badge_id}**${expiry}. Committed to \`${result.path}\`.`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: note,
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: "closed",
+            });

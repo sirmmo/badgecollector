@@ -1,0 +1,47 @@
+name: Award a Badge (manual)
+description: Manually grant a badge to a user, identified only by their hashed email.
+title: "[award] "
+labels: ["badge-award"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Manually award a badge. Only repository collaborators can trigger the write; others will get a comment from the workflow.
+
+        **Compute the email hash yourself** before submitting. The raw email must never appear in this issue. Use:
+
+        ```sh
+        printf '%s' "$(echo -n 'user@example.com' | tr A-Z a-z)" | sha256sum
+        ```
+  - type: input
+    id: badge_id
+    attributes:
+      label: Badge ID
+      description: Must match an existing badge in `content/badges/`.
+      placeholder: early-adopter
+    validations:
+      required: true
+  - type: input
+    id: email_hash
+    attributes:
+      label: Email hash
+      description: 64 hex characters. Compute as `sha256(lowercase(nfc(email)))`.
+      placeholder: 8f3e2a91...64hex
+    validations:
+      required: true
+  - type: input
+    id: expires_at
+    attributes:
+      label: Expires at
+      description: Optional ISO 8601 datetime (e.g. `2027-06-09T00:00:00Z`). Leave empty for non-expiring.
+      placeholder: 2027-06-09T00:00:00Z
+    validations:
+      required: false
+  - type: input
+    id: evidence
+    attributes:
+      label: Evidence URL
+      description: Optional URL pointing to the source justifying this award.
+      placeholder: https://example.com/transcript/42
+    validations:
+      required: false

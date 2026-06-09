@@ -1,0 +1,9 @@
+id: manual
+name: Manual (via GitHub Issues)
+homepage: ""
+owner_contact: maintainers
+api_key_hash: null
+hash_scheme: email-sha256
+created_at: 2026-06-09
+revoked: false
+schema: 1

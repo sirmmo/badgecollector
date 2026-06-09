@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <circle cx="64" cy="64" r="60" fill="#dceefe" stroke="#2547d0" stroke-width="3"/>
+  <text x="64" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" font-weight="700" fill="#1f3aa3">FIRST PR</text>
+</svg>

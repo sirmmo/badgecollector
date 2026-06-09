@@ -1,0 +1,48 @@
+{{ define "main" }}
+<article class="badge-detail">
+  <header class="badge-header">
+    {{ with .Params.image }}<img src="{{ . | relURL }}" alt="" class="badge-image-large">{{ end }}
+    <div>
+      <h1>{{ .Params.name | default .Title }}</h1>
+      <p class="lede">{{ .Params.description }}</p>
+    </div>
+  </header>
+
+  <dl class="badge-meta">
+    <dt>Badge ID</dt>
+    <dd><code>{{ .Params.id }}</code></dd>
+
+    <dt>Criteria</dt>
+    <dd>{{ .Params.criteria }}</dd>
+
+    <dt>Issuers</dt>
+    <dd>
+      {{ $issuers := .Params.issuers }}
+      {{ if $issuers }}
+        {{ range $i, $cid := $issuers }}{{ if $i }}, {{ end }}{{ with index site.Data.clients $cid }}<a href="{{ printf "/clients/#%s" .id | relURL }}">{{ .name }}</a>{{ else }}<code>{{ $cid }}</code>{{ end }}{{ end }}
+      {{ else }}
+        Any registered client may award this badge.
+      {{ end }}
+    </dd>
+
+    {{ with .Params.tags }}
+    <dt>Tags</dt>
+    <dd>
+      {{ range . }}<span class="tag">{{ . }}</span>{{ end }}
+    </dd>
+    {{ end }}
+
+    {{ with .Params.created_at }}
+    <dt>Created</dt>
+    <dd>{{ . }}</dd>
+    {{ end }}
+
+    {{ if .Params.repeatable }}
+    <dt>Repeatable</dt>
+    <dd>Yes &mdash; the same user can earn this badge multiple times.</dd>
+    {{ end }}
+  </dl>
+
+  <div class="content">{{ .Content }}</div>
+</article>
+{{ end }}

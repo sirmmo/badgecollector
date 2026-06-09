@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/discussions
+    about: Use this form to define a new badge or award one. For anything else, open a discussion.

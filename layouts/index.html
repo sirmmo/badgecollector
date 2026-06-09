@@ -1,0 +1,11 @@
+{{ define "main" }}
+<section class="hero">
+  <h1>{{ site.Title }}</h1>
+  <p class="lede">{{ site.Params.description }}</p>
+  <div class="content">{{ .Content }}</div>
+  <p class="cta">
+    <a href="{{ "/badges/" | relURL }}">Browse badges</a>
+    <a href="{{ "/clients/" | relURL }}">Registered clients</a>
+  </p>
+</section>
+{{ end }}

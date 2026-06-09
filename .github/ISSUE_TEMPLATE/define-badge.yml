@@ -1,0 +1,83 @@
+name: Define a Badge
+description: Propose a new badge for the catalog. A workflow will open a PR for review.
+title: "[badge] "
+labels: ["badge-definition"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in the fields below to propose a new badge. A workflow will validate your input and open a pull request. A maintainer will review and merge.
+  - type: input
+    id: badge_id
+    attributes:
+      label: Badge ID
+      description: Lowercase letters, digits, and dashes only. Must match `^[a-z0-9][a-z0-9-]{1,40}[a-z0-9]$`. Becomes the filename and URL slug.
+      placeholder: early-adopter
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: Human-readable display name.
+      placeholder: Early Adopter
+    validations:
+      required: true
+  - type: input
+    id: description
+    attributes:
+      label: Description
+      description: One-line summary shown in the badge card.
+      placeholder: Joined during the beta period.
+    validations:
+      required: true
+  - type: input
+    id: image_url
+    attributes:
+      label: Image URL
+      description: Absolute URL or repo-relative path (e.g. `/img/badges/early-adopter.svg`). If omitted, the catalog renders a placeholder.
+      placeholder: /img/badges/early-adopter.svg
+    validations:
+      required: false
+  - type: input
+    id: issuers
+    attributes:
+      label: Issuers
+      description: Comma-separated client IDs allowed to award this badge. Leave empty for "any registered client".
+      placeholder: acme-corp, example-app
+    validations:
+      required: false
+  - type: dropdown
+    id: repeatable
+    attributes:
+      label: Repeatable
+      description: Can the same user earn this badge more than once?
+      options:
+        - "No"
+        - "Yes"
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Criteria
+      description: Plain-text description of when this badge is awarded. Shown on the badge detail page.
+      placeholder: Awarded to users who completed onboarding before 2026-01-01.
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: Comma-separated tags for filtering and discovery.
+      placeholder: milestone, time-limited
+    validations:
+      required: false
+  - type: textarea
+    id: body
+    attributes:
+      label: Long-form description
+      description: Optional Markdown body shown below the metadata on the badge page.
+    validations:
+      required: false
