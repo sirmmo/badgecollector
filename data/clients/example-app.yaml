@@ -1,9 +1,0 @@
-id: example-app
-name: Example App
-homepage: https://example.app
-owner_contact: hello@example.app
-api_key_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
-hash_scheme: hmac
-created_at: 2026-05-07
-revoked: false
-schema: 1
