@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-ohmc"><polygon points="64,8 116,38 116,90 64,120 12,90 12,38"/></clipPath>
+  </defs>
+  <polygon points="64,8 116,38 116,90 64,120 12,90 12,38" fill="#e8d650"/>
+  <g clip-path="url(#clip-ohmc)" stroke="#2c1212" stroke-width="2" fill="none">
+    <path d="M28 50 L40 50 M88 50 L100 50 M28 78 L40 78 M88 78 L100 78 M64 26 L64 36 M64 92 L64 102"/>
+  </g>
+  <g clip-path="url(#clip-ohmc)">
+    <circle cx="64" cy="64" r="26" fill="#fff7e3" stroke="#2c1212" stroke-width="2.5"/>
+    <path d="M64 42 L70 64 L64 86 L58 64 Z" fill="#2c1212"/>
+    <path d="M42 64 L64 58 L86 64 L64 70 Z" fill="#2c1212"/>
+    <circle cx="64" cy="64" r="3" fill="#e8d650"/>
+  </g>
+  <polygon points="64,8 116,38 116,90 64,120 12,90 12,38" fill="none" stroke="#5a4a0f" stroke-width="3"/>
+</svg>
