@@ -32,10 +32,15 @@ jobs:
         run: npx wrangler deploy
 
       - name: Sync GH_BOT_PAT to Worker secrets
-        if: ${{ secrets.GH_BOT_PAT != '' }}
         working-directory: worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
-        run: printf '%s' "$GH_BOT_PAT" | npx wrangler secret put GH_BOT_PAT
+        run: |
+          if [ -z "$GH_BOT_PAT" ]; then
+            echo "GH_BOT_PAT not set as GitHub secret; skipping Worker secret sync."
+            echo "/award will return 500 until you set GH_BOT_PAT (GitHub repo secret or 'wrangler secret put' locally)."
+            exit 0
+          fi
+          printf '%s' "$GH_BOT_PAT" | npx wrangler secret put GH_BOT_PAT
