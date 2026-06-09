@@ -8,4 +8,21 @@
     <a href="{{ "/clients/" | relURL }}">Registered clients</a>
   </p>
 </section>
+
+<section class="lookup">
+  <h2>Look up your badges</h2>
+  <p class="lede">Paste the SHA-256 hash of your lowercase email to see what you've been awarded.</p>
+  <form id="lookup-form" autocomplete="off">
+    <input type="text" name="hash" id="lookup-hash" pattern="[0-9a-fA-F]{64}" placeholder="64-character hex hash" required>
+    <button type="submit">Look up</button>
+  </form>
+  <p class="hint"><small>Compute it yourself: <code>echo -n "you@example.com" | tr A-Z a-z | sha256sum</code></small></p>
+</section>
+<script>
+  document.getElementById("lookup-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var h = document.getElementById("lookup-hash").value.trim().toLowerCase();
+    if (/^[0-9a-f]{64}$/.test(h)) window.location.href = "/m/" + h + "/";
+  });
+</script>
 {{ end }}

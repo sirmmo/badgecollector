@@ -55,3 +55,23 @@ code { background: rgba(0,0,0,0.05); padding: 0.1em 0.35em; border-radius: 3px; 
 .cta { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
 .cta a { display: inline-block; padding: 0.5rem 1rem; border: 1px solid var(--accent); border-radius: var(--radius); text-decoration: none; }
 .cta a:first-child { background: var(--accent); color: white; }
+
+.lookup { margin-top: 3rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); }
+.lookup h2 { margin-top: 0; }
+.lookup form { display: flex; gap: 0.5rem; margin: 0.75rem 0; }
+.lookup input { flex: 1; padding: 0.5rem 0.75rem; font-family: ui-monospace, "SF Mono", monospace; font-size: 0.9rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+.lookup button { padding: 0.5rem 1rem; border: 1px solid var(--accent); background: var(--accent); color: white; border-radius: var(--radius); cursor: pointer; font: inherit; }
+.lookup button:hover { filter: brightness(1.08); }
+.lookup .hint { color: var(--muted); margin: 0.25rem 0 0; }
+
+.recipient header { margin-bottom: 2rem; }
+.recipient header code { font-size: 0.85rem; word-break: break-all; }
+
+.awards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.award-card { padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card-bg); }
+.award-card.expired { opacity: 0.55; }
+.award-card.revoked { opacity: 0.4; border-color: #b34141; }
+.award-card .badge-image { width: 48px; height: 48px; float: right; margin: 0 0 0.5rem 0.5rem; }
+.award-meta { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 0.75rem; margin: 0.75rem 0 0; font-size: 0.85rem; }
+.award-meta dt { color: var(--muted); }
+.award-meta dd { margin: 0; word-break: break-word; }

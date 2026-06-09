@@ -9,8 +9,10 @@ A public, file-backed badge & certification system. Four moving parts:
 
 ```
 content/badges/{badge_id}.md           # badge definition (Hugo content)
+content/m/{email_hash}.md              # recipient stub (manual awards only)
 data/clients/{client_id}.yaml          # registered third-party app
-users/{client_id}/{user_id_hash}.json  # awards for one (client, user) pair
+users/{client_id}/{user_id_hash}.json  # awards from API clients (per-user JSON)
+users/manual.csv                       # manual awards (single append-only CSV)
 profiles/{handle}.json                 # email-verified global identity
 worker/                                # Cloudflare Worker source
 layouts/, themes/, hugo.yaml           # Hugo site
@@ -90,7 +92,23 @@ Rules:
 - `hash_scheme: email-sha256`: user_id → `sha256(lowercase(nfc(user_id)))`. Used by the reserved `manual` client for issue-driven awards.
 - `api_key_hash: null` means no API access (used by `manual`).
 
-### User awards — `users/{client_id}/{user_id_hash}.json`
+### Manual awards — `users/manual.csv`
+
+Issue-driven awards live in one append-only CSV. Source of truth for the `manual` namespace.
+
+```
+email_hash,badge_id,awarded_at,expires_at,issued_by,evidence,revoked_at
+8f3e2a91...64hex,early-adopter,2026-06-09T03:43:48.762Z,2027-06-09T00:00:00.000Z,gh:marcomontanari,https://github.com/sirmmo/badgecollector/issues/1,
+```
+
+Rules:
+- Header row required. Fields use RFC 4180 quoting (double-quote fields that contain `,`, `"`, or newlines; escape inner quotes by doubling).
+- `email_hash` is `sha256(lowercase(nfc(email)))` (64 hex chars). See `hash_scheme: email-sha256` on `data/clients/manual.yaml`.
+- Rows are append-only and sorted by `awarded_at` ascending. Revocation = filling in `revoked_at`, never removing the row.
+- Idempotency = `(email_hash, badge_id)` for non-repeatable badges. Re-adding a row that already exists (and isn't revoked) is a no-op.
+- Each recipient also has a `content/m/{email_hash}.md` stub so Hugo generates `/m/{email_hash}/` at build time. The page layout filters the CSV by the stub's `email_hash` frontmatter.
+
+### API client awards — `users/{client_id}/{user_id_hash}.json`
 
 ```json
 {
@@ -270,6 +288,7 @@ Pages built from the file tree:
 | `/clients/`                       | list of `data/clients/*.yaml` (public fields only — no key hash) |
 | `/clients/{client_id}/`           | client homepage card + badges they can issue |
 | `/a/{client_id}/{user_id_hash}/`  | per-(client,user) wall from `users/{client_id}/{user_id_hash}.json` |
+| `/m/{email_hash}/`                | manual recipient wall, filters `users/manual.csv` by `email_hash` |
 | `/u/{handle}/`                    | global wall, aggregates claims from `profiles/{handle}.json` |
 
 Implementation note: `/a/...` and `/u/...` pages are generated at build time from the JSON files. Each award commit triggers a rebuild. For the MVP this is fine. If award volume grows, switch the user-page layer to a Worker-rendered route that reads JSON live (Hugo still owns badge pages and chrome).
@@ -291,7 +310,7 @@ Two GitHub Issue Forms back two Actions, giving a no-Worker path for both badge 
 - Action: `.github/workflows/award-badge.yml` triggers on `issues.opened` / `issues.labeled` with that label.
 - Authority gate: only `OWNER`, `MEMBER`, or `COLLABORATOR` can trigger the write; other authors get a comment explaining a maintainer must approve.
 - Inputs: `badge_id`, `email_hash` (64 hex), `expires_at` (optional ISO 8601), `evidence` (optional URL).
-- Behavior: validates inputs, reads `users/manual/{email_hash}.json` (creates if missing), appends the award (idempotent unless the badge is `repeatable`), commits directly to `main`, closes the issue.
+- Behavior: validates inputs, appends a row to `users/manual.csv` (idempotent on `(email_hash, badge_id)` unless the badge is `repeatable`), creates `content/m/{email_hash}.md` stub if it doesn't yet exist, commits to `main`, closes the issue.
 - The submitter is responsible for computing `email_hash = sha256(lowercase(nfc(email)))` themselves. The raw email never appears in the issue, the workflow, or the repo.
 
 ### Reserved `manual` client

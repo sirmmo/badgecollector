@@ -1,0 +1,63 @@
+{{ define "main" }}
+{{ $hash := .Params.email_hash }}
+{{ $csv := slice }}
+{{ with try (os.ReadFile "users/manual.csv") }}
+  {{ with .Err }}
+    {{ warnf "could not read users/manual.csv: %s" . }}
+  {{ else }}
+    {{ $lines := split (strings.TrimSpace .Value) "\n" }}
+    {{ range $i, $line := $lines }}
+      {{ if gt $i 0 }}
+        {{ $values := split $line "," }}
+        {{ if eq (index $values 0) $hash }}
+          {{ $csv = $csv | append (dict
+            "email_hash" (index $values 0)
+            "badge_id"   (index $values 1)
+            "awarded_at" (index $values 2)
+            "expires_at" (index $values 3)
+            "issued_by"  (index $values 4)
+            "evidence"   (index $values 5)
+            "revoked_at" (index $values 6 | default "")
+          ) }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+<article class="recipient">
+  <header>
+    <h1>Recipient</h1>
+    <p class="lede">SHA-256 of lowercase email</p>
+    <p><code>{{ $hash }}</code></p>
+    <p>{{ len $csv }} badge{{ if ne (len $csv) 1 }}s{{ end }} earned.</p>
+  </header>
+
+  <div class="awards">
+    {{ $now := now.Format "2006-01-02T15:04:05Z07:00" }}
+    {{ range $csv }}
+      {{ $badgePage := site.GetPage (printf "/badges/%s" .badge_id) }}
+      {{ $expired := and .expires_at (lt .expires_at $now) }}
+      {{ $revoked := ne .revoked_at "" }}
+      <article class="award-card {{ if $expired }}expired{{ end }} {{ if $revoked }}revoked{{ end }}">
+        {{ with $badgePage }}
+          {{ with .Params.image }}<img src="{{ strings.TrimPrefix "/" . | relURL }}" alt="" class="badge-image">{{ end }}
+          <h2><a href="{{ $badgePage.RelPermalink }}">{{ .Params.name | default .Title }}</a></h2>
+          <p>{{ .Params.description }}</p>
+        {{ else }}
+          <h2><code>{{ .badge_id }}</code></h2>
+        {{ end }}
+        <dl class="award-meta">
+          <dt>Awarded</dt><dd>{{ .awarded_at }}</dd>
+          {{ with .expires_at }}<dt>Expires</dt><dd>{{ . }}{{ if $expired }} (expired){{ end }}</dd>{{ end }}
+          <dt>Issued by</dt><dd>{{ .issued_by }}</dd>
+          {{ with .evidence }}<dt>Evidence</dt><dd><a href="{{ . }}" rel="noopener">{{ . }}</a></dd>{{ end }}
+          {{ if $revoked }}<dt>Revoked</dt><dd>{{ .revoked_at }}</dd>{{ end }}
+        </dl>
+      </article>
+    {{ else }}
+      <p>No awards found for this recipient yet.</p>
+    {{ end }}
+  </div>
+</article>
+{{ end }}

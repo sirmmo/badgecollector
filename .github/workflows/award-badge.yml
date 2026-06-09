@@ -94,17 +94,20 @@ jobs:
         env:
           RESULT: ${{ steps.apply.outputs.result }}
         run: |
-          PATH_TO_COMMIT="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).path))')"
           DUPLICATE="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(String(JSON.parse(d.toString()).duplicate)))')"
           if [ "$DUPLICATE" = "true" ]; then
             echo "Duplicate award, no commit needed."
             exit 0
           fi
           BADGE_ID="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).badge_id))')"
-          HASH="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).user_id_hash))')"
+          HASH="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).email_hash))')"
+          STUB_PATH="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).stub_path || ""))')"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$PATH_TO_COMMIT"
+          git add users/manual.csv
+          if [ -n "$STUB_PATH" ]; then
+            git add "$STUB_PATH"
+          fi
           git commit -m "Award ${BADGE_ID} to ${HASH:0:12}... (manual)" -m "From issue #${{ github.event.issue.number }}"
           git push
 
@@ -119,7 +122,7 @@ jobs:
             const expiry = result.expires_at ? ` (expires ${result.expires_at})` : "";
             const note = result.duplicate
               ? `Already awarded — nothing to do.`
-              : `Awarded **${result.badge_id}**${expiry}. Committed to \`${result.path}\`.`;
+              : `Awarded **${result.badge_id}**${expiry}. Recipient page: [/m/${result.email_hash.slice(0,8)}…/](https://badgecollector.org/m/${result.email_hash}/).`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
