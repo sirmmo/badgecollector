@@ -1,4 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <circle cx="64" cy="64" r="60" fill="#dceefe" stroke="#2547d0" stroke-width="3"/>
-  <text x="64" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="18" font-weight="700" fill="#1f3aa3">FIRST PR</text>
+  <defs>
+    <clipPath id="clip-fc"><polygon points="64,8 116,38 116,90 64,120 12,90 12,38"/></clipPath>
+  </defs>
+  <polygon points="64,8 116,38 116,90 64,120 12,90 12,38" fill="#ee6f5a"/>
+  <g clip-path="url(#clip-fc)">
+    <polygon points="64,30 96,48 96,80 64,98 32,80 32,48" fill="#fce5dd"/>
+    <path d="M48 70 L60 58 L60 64 L80 64 L80 78 L60 78 L60 84 Z" fill="#2c1212"/>
+  </g>
+  <polygon points="64,8 116,38 116,90 64,120 12,90 12,38" fill="none" stroke="#5a1c14" stroke-width="3"/>
 </svg>

@@ -1,31 +1,38 @@
 {{ define "main" }}
-<section class="clients-list">
-  <h1>{{ .Title }}</h1>
-  {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
-  <p>Each registered client can issue badges via the award API. To register, open a pull request adding a YAML file under <code>data/clients/</code>.</p>
-
-  <ul class="client-cards">
-    {{ range $id, $client := site.Data.clients }}
-    <li class="client-card" id="{{ $client.id }}">
-      <h2>{{ $client.name }}</h2>
-      <dl>
-        <dt>Client ID</dt>
-        <dd><code>{{ $client.id }}</code></dd>
-        {{ with $client.homepage }}
-        <dt>Homepage</dt>
-        <dd><a href="{{ . }}" rel="noopener">{{ . }}</a></dd>
-        {{ end }}
-        {{ with $client.created_at }}
-        <dt>Registered</dt>
-        <dd>{{ . }}</dd>
-        {{ end }}
-        {{ if $client.revoked }}
-        <dt>Status</dt>
-        <dd class="revoked">Revoked</dd>
-        {{ end }}
-      </dl>
-    </li>
-    {{ end }}
-  </ul>
+<section class="page-head">
+  <div>
+    <div class="page-eyebrow">Issuers</div>
+    <h1 class="page-title">Who pins&nbsp;them.</h1>
+    <p class="page-lede">Apps registered to award badges. Each has a hashed API key in <code style="font-family:var(--ff-mono); color:var(--citron)">data/clients/*.yaml</code>; revocation is one commit away.</p>
+  </div>
+  <div class="page-counter">
+    <strong>{{ printf "%02d" (len site.Data.clients) }}</strong>
+    registered
+  </div>
 </section>
+
+<div class="clients-grid">
+  {{ range $id, $client := site.Data.clients }}
+  <article class="client-card" id="{{ $client.id }}">
+    <span class="client-id">{{ $client.id }}</span>
+    <h2>{{ $client.name }}</h2>
+    <dl class="client-meta">
+      {{ with $client.homepage }}
+      <dt>Homepage</dt>
+      <dd><a href="{{ . }}" rel="noopener" style="color:var(--citron-soft)">{{ . }}</a></dd>
+      {{ end }}
+      {{ with $client.hash_scheme }}
+      <dt>Hash scheme</dt>
+      <dd>{{ . }}</dd>
+      {{ end }}
+      {{ with $client.created_at }}
+      <dt>Registered</dt>
+      <dd>{{ . }}</dd>
+      {{ end }}
+      <dt>Status</dt>
+      <dd{{ if $client.revoked }} class="revoked"{{ end }}>{{ if $client.revoked }}revoked{{ else }}active{{ end }}</dd>
+    </dl>
+  </article>
+  {{ end }}
+</div>
 {{ end }}

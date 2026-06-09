@@ -1,48 +1,57 @@
 {{ define "main" }}
-<article class="badge-detail">
-  <header class="badge-header">
-    {{ with .Params.image }}<img src="{{  strings.TrimPrefix "/" . | relURL }}" alt="" class="badge-image-large">{{ end }}
-    <div>
-      <h1>{{ .Params.name | default .Title }}</h1>
-      <p class="lede">{{ .Params.description }}</p>
+<section class="badge-detail">
+  <aside class="badge-hero">
+    {{ with .Params.image }}<img class="badge-hero-img" src="{{ strings.TrimPrefix "/" . | relURL }}" alt="">{{ end }}
+    <h1 class="badge-hero-name">{{ .Params.name | default .Title }}</h1>
+    <div class="badge-hero-id">{{ .Params.id }}</div>
+  </aside>
+
+  <div class="badge-meta-block">
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">Tagline</div>
+      <div class="badge-meta-val">{{ .Params.description }}</div>
     </div>
-  </header>
-
-  <dl class="badge-meta">
-    <dt>Badge ID</dt>
-    <dd><code>{{ .Params.id }}</code></dd>
-
-    <dt>Criteria</dt>
-    <dd>{{ .Params.criteria }}</dd>
-
-    <dt>Issuers</dt>
-    <dd>
-      {{ $issuers := .Params.issuers }}
-      {{ if $issuers }}
-        {{ range $i, $cid := $issuers }}{{ if $i }}, {{ end }}{{ with index site.Data.clients $cid }}<a href="{{ printf "/clients/#%s" .id | relURL }}">{{ .name }}</a>{{ else }}<code>{{ $cid }}</code>{{ end }}{{ end }}
-      {{ else }}
-        Any registered client may award this badge.
-      {{ end }}
-    </dd>
-
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">Criteria</div>
+      <div class="badge-meta-val">{{ .Params.criteria }}</div>
+    </div>
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">Issuers</div>
+      <div class="badge-meta-val">
+        {{ $issuers := .Params.issuers }}
+        {{ if $issuers }}
+          {{ range $i, $cid := $issuers }}{{ if $i }}, {{ end }}{{ with index site.Data.clients $cid }}<a href="{{ printf "/clients/#%s" .id | relURL }}">{{ .name }}</a>{{ else }}<code>{{ $cid }}</code>{{ end }}{{ end }}
+        {{ else }}
+          Any registered client may award this badge.
+        {{ end }}
+      </div>
+    </div>
     {{ with .Params.tags }}
-    <dt>Tags</dt>
-    <dd>
-      {{ range . }}<span class="tag">{{ . }}</span>{{ end }}
-    </dd>
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">Tags</div>
+      <div class="badge-meta-val">
+        <div class="badge-tags">
+          {{ range . }}<span class="badge-tag">{{ . }}</span>{{ end }}
+        </div>
+      </div>
+    </div>
     {{ end }}
-
     {{ with .Params.created_at }}
-    <dt>Created</dt>
-    <dd>{{ . }}</dd>
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">First minted</div>
+      <div class="badge-meta-val"><code>{{ . }}</code></div>
+    </div>
     {{ end }}
-
-    {{ if .Params.repeatable }}
-    <dt>Repeatable</dt>
-    <dd>Yes &mdash; the same user can earn this badge multiple times.</dd>
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">Repeatable</div>
+      <div class="badge-meta-val">{{ if .Params.repeatable }}Yes — multiple awards permitted per recipient.{{ else }}No — once per recipient.{{ end }}</div>
+    </div>
+    {{ with .Content }}
+    <div class="badge-meta-row">
+      <div class="badge-meta-key">Notes</div>
+      <div class="badge-meta-val">{{ . }}</div>
+    </div>
     {{ end }}
-  </dl>
-
-  <div class="content">{{ .Content }}</div>
-</article>
+  </div>
+</section>
 {{ end }}

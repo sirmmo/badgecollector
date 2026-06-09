@@ -1,12 +1,19 @@
 {{ define "main" }}
-<article class="page">
-  <h1>{{ .Title }}</h1>
-  {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
-  <div class="content">{{ .Content }}</div>
-  <ul class="page-list">
-    {{ range .Pages }}
-    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ with .Description }} &mdash; {{ . }}{{ end }}</li>
-    {{ end }}
-  </ul>
-</article>
+<section class="page-head">
+  <div>
+    <div class="page-eyebrow">Index</div>
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{ with .Description }}<p class="page-lede">{{ . }}</p>{{ end }}
+  </div>
+  <div class="page-counter">
+    <strong>{{ printf "%02d" (len .Pages) }}</strong>
+    entries
+  </div>
+</section>
+{{ with .Content }}<div class="badge-meta-val" style="margin-bottom: var(--sp-6)">{{ . }}</div>{{ end }}
+<ul class="page-list">
+  {{ range .Pages }}
+  <li><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ with .Description }} &middot; <span style="color:var(--fg-mute); font-family:var(--ff-body); font-size:var(--t-1)">{{ . }}</span>{{ end }}</li>
+  {{ end }}
+</ul>
 {{ end }}

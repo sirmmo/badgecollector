@@ -1,20 +1,31 @@
 {{ define "main" }}
-<section class="badges-list">
-  <h1>{{ .Title }}</h1>
-  {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
-  <div class="badges-grid">
-    {{ range .Pages.ByTitle }}
-    <a class="badge-card" href="{{ .RelPermalink }}">
-      {{ with .Params.image }}<img src="{{  strings.TrimPrefix "/" . | relURL }}" alt="" class="badge-image">{{ end }}
-      <h2>{{ .Params.name | default .Title }}</h2>
-      <p>{{ .Params.description }}</p>
-      {{ with .Params.tags }}
-      <p class="tags">
-        {{ range . }}<span class="tag">{{ . }}</span>{{ end }}
-      </p>
-      {{ end }}
-    </a>
-    {{ end }}
+<section class="page-head">
+  <div>
+    <div class="page-eyebrow">The catalog</div>
+    <h1 class="page-title">Badges, in&nbsp;circulation.</h1>
+    {{ with .Description }}<p class="page-lede">{{ . }}</p>{{ end }}
+  </div>
+  <div class="page-counter">
+    <strong>{{ printf "%02d" (len .Pages) }}</strong>
+    in catalog
   </div>
 </section>
+
+<div class="badge-grid">
+  {{ range .Pages.ByTitle }}
+    <a class="badge-card" href="{{ .RelPermalink }}">
+      <div class="badge-card-vignette">
+        {{ with .Params.image }}<img class="badge-card-img" src="{{ strings.TrimPrefix "/" . | relURL }}" alt="">{{ end }}
+      </div>
+      <div class="badge-card-body">
+        <h2 class="badge-card-name">{{ .Params.name | default .Title }}</h2>
+        <p class="badge-card-desc">{{ .Params.description }}</p>
+        <div class="badge-card-strip">
+          <span><code>{{ .Params.id }}</code></span>
+          {{ with index (.Params.tags | default slice) 0 }}<span class="badge-card-tag">{{ . }}</span>{{ end }}
+        </div>
+      </div>
+    </a>
+  {{ end }}
+</div>
 {{ end }}

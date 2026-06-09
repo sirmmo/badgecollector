@@ -1,23 +1,21 @@
 {{ define "main" }}
 {{ $hash := .Params.email_hash }}
-{{ $csv := slice }}
+{{ $rows := slice }}
 {{ with try (os.ReadFile "users/manual.csv") }}
-  {{ with .Err }}
-    {{ warnf "could not read users/manual.csv: %s" . }}
-  {{ else }}
-    {{ $lines := split (strings.TrimSpace .Value) "\n" }}
+  {{ with .Value }}
+    {{ $lines := split (strings.TrimSpace .) "\n" }}
     {{ range $i, $line := $lines }}
       {{ if gt $i 0 }}
-        {{ $values := split $line "," }}
-        {{ if eq (index $values 0) $hash }}
-          {{ $csv = $csv | append (dict
-            "email_hash" (index $values 0)
-            "badge_id"   (index $values 1)
-            "awarded_at" (index $values 2)
-            "expires_at" (index $values 3)
-            "issued_by"  (index $values 4)
-            "evidence"   (index $values 5)
-            "revoked_at" (index $values 6 | default "")
+        {{ $v := split $line "," }}
+        {{ if eq (index $v 0) $hash }}
+          {{ $rows = $rows | append (dict
+            "email_hash" (index $v 0)
+            "badge_id"   (index $v 1)
+            "awarded_at" (index $v 2)
+            "expires_at" (index $v 3)
+            "issued_by"  (index $v 4)
+            "evidence"   (index $v 5)
+            "revoked_at" (index $v 6 | default "")
           ) }}
         {{ end }}
       {{ end }}
@@ -25,58 +23,92 @@
   {{ end }}
 {{ end }}
 
-<article class="recipient">
-  <header>
-    <h1>Recipient</h1>
-    <p class="lede">SHA-256 of lowercase email</p>
-    <p><code>{{ $hash }}</code></p>
-    <p>{{ len $csv }} badge{{ if ne (len $csv) 1 }}s{{ end }} earned.</p>
-  </header>
+{{ $count := len $rows }}
+{{ $now := now.Format "2006-01-02T15:04:05Z07:00" }}
+{{ $countDisplay := printf "%02d" $count }}
 
-  <div class="awards">
-    {{ $now := now.Format "2006-01-02T15:04:05Z07:00" }}
-    {{ range $csv }}
-      {{ $badgePage := site.GetPage (printf "/badges/%s" .badge_id) }}
-      {{ $expired := and .expires_at (lt .expires_at $now) }}
-      {{ $revoked := ne .revoked_at "" }}
-      <article class="award-card {{ if $expired }}expired{{ end }} {{ if $revoked }}revoked{{ end }}">
-        {{ with $badgePage }}
-          {{ with .Params.image }}<img src="{{ strings.TrimPrefix "/" . | relURL }}" alt="" class="badge-image">{{ end }}
-          <h2><a href="{{ $badgePage.RelPermalink }}">{{ .Params.name | default .Title }}</a></h2>
-          <p>{{ .Params.description }}</p>
-        {{ else }}
-          <h2><code>{{ .badge_id }}</code></h2>
-        {{ end }}
-        <dl class="award-meta">
-          <dt>Awarded</dt><dd>{{ .awarded_at }}</dd>
-          {{ with .expires_at }}<dt>Expires</dt><dd>{{ . }}{{ if $expired }} (expired){{ end }}</dd>{{ end }}
-          <dt>Issued by</dt><dd>{{ .issued_by }}</dd>
-          {{ with .evidence }}<dt>Evidence</dt><dd><a href="{{ . }}" rel="noopener">{{ . }}</a></dd>{{ end }}
-          {{ if $revoked }}<dt>Revoked</dt><dd>{{ .revoked_at }}</dd>{{ end }}
-        </dl>
-      </article>
-    {{ else }}
-      <p>No awards found for this recipient yet.</p>
-    {{ end }}
+<section class="recipient-hero">
+  <div class="recipient-count">{{ $countDisplay }}</div>
+  <div class="recipient-label">
+    <span class="recipient-eyebrow">Recipient wall</span>
+    <span class="recipient-noun">{{ if eq $count 1 }}One badge earned.{{ else }}{{ $count }} badges earned.{{ end }}</span>
+    <span class="recipient-hash">sha256 · {{ $hash }}</span>
   </div>
+</section>
 
-  <section class="embed-help">
-    <h2>Embed</h2>
-    <p>Paste this anywhere to show this recipient's badges:</p>
-    <pre><code id="embed-snippet">&lt;iframe src=&quot;https://badgecollector.org/m/{{ $hash }}/embed.html&quot; width=&quot;100%&quot; height=&quot;160&quot; frameborder=&quot;0&quot; loading=&quot;lazy&quot; title=&quot;Badges&quot;&gt;&lt;/iframe&gt;</code></pre>
+{{ if $rows }}
+<div class="wall">
+  {{ range $rows }}
+    {{ $badgePage := site.GetPage (printf "/badges/%s" .badge_id) }}
+    {{ $expired := and (ne .expires_at "") (lt .expires_at $now) }}
+    {{ $revoked := ne .revoked_at "" }}
+    {{ $classes := slice "wall-card" }}
+    {{ if $expired }}{{ $classes = $classes | append "is-expired" }}{{ end }}
+    {{ if $revoked }}{{ $classes = $classes | append "is-revoked" }}{{ end }}
+    <article class="{{ delimit $classes " " }}">
+      <div class="wall-card-art">
+        {{ with $badgePage }}
+          {{ with .Params.image }}<img src="{{ strings.TrimPrefix "/" . | relURL }}" alt="">{{ end }}
+        {{ end }}
+      </div>
+      <div class="wall-card-body">
+        <h2 class="wall-card-name">
+          {{ with $badgePage }}<a href="{{ .RelPermalink }}">{{ .Params.name | default .Title }}</a>{{ else }}<code>{{ .badge_id }}</code>{{ end }}
+        </h2>
+        {{ with $badgePage }}<p class="wall-card-desc">{{ .Params.description }}</p>{{ end }}
+        <dl class="wall-card-strip">
+          <div class="wall-card-row">
+            <dt>Awarded</dt>
+            <dd>{{ substr .awarded_at 0 10 }}</dd>
+          </div>
+          {{ with .expires_at }}
+          <div class="wall-card-row">
+            <dt>Expires</dt>
+            <dd>{{ substr . 0 10 }}</dd>
+          </div>
+          {{ end }}
+          <div class="wall-card-row">
+            <dt>By</dt>
+            <dd>{{ .issued_by }}</dd>
+          </div>
+          {{ if $revoked }}
+          <div class="wall-card-row">
+            <dt>State</dt>
+            <dd><span class="wall-card-state">revoked</span></dd>
+          </div>
+          {{ else if $expired }}
+          <div class="wall-card-row">
+            <dt>State</dt>
+            <dd><span class="wall-card-state">expired</span></dd>
+          </div>
+          {{ end }}
+        </dl>
+      </div>
+    </article>
+  {{ end }}
+</div>
+{{ else }}
+<p class="empty">No awards on file for this hash yet.</p>
+{{ end }}
+
+<section class="embed-widget">
+  <h2>Stick this on your bio.</h2>
+  <p>Paste anywhere — Twitter card, personal site, Notion, README. Auto-resizes via <code style="color:var(--citron-soft); font-family:var(--ff-mono)">postMessage</code> if the host listens.</p>
+  <pre class="embed-snippet"><code id="embed-snippet">&lt;iframe src=&quot;https://badgecollector.org/m/{{ $hash }}/embed.html&quot; width=&quot;100%&quot; height=&quot;180&quot; frameborder=&quot;0&quot; loading=&quot;lazy&quot; title=&quot;Badges&quot;&gt;&lt;/iframe&gt;</code></pre>
+  <div class="embed-actions">
     <button type="button" id="embed-copy">Copy snippet</button>
-    <p><a href="{{ printf "/m/%s/embed.html" $hash | relURL }}">Preview the embed</a>. The page sends <code>postMessage({type:"badgecollector:resize", height})</code> so the host can auto-size the iframe.</p>
-    <script>
-      document.getElementById("embed-copy").addEventListener("click", function () {
-        var text = document.getElementById("embed-snippet").textContent;
-        navigator.clipboard.writeText(text).then(function () {
-          var b = document.getElementById("embed-copy");
-          var t = b.textContent;
-          b.textContent = "Copied";
-          setTimeout(function () { b.textContent = t; }, 1500);
-        });
+    <a class="quiet-link" href="{{ printf "/m/%s/embed.html" $hash | relURL }}">Preview the embed</a>
+  </div>
+  <script>
+    document.getElementById("embed-copy").addEventListener("click", function () {
+      var text = document.getElementById("embed-snippet").textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        var b = document.getElementById("embed-copy");
+        var t = b.textContent;
+        b.textContent = "Copied";
+        setTimeout(function () { b.textContent = t; }, 1400);
       });
-    </script>
-  </section>
-</article>
+    });
+  </script>
+</section>
 {{ end }}

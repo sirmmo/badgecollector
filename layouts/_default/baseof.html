@@ -3,13 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ block "title" . }}{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} | {{ site.Title }}{{ end }}{{ end }}</title>
+  <meta name="theme-color" content="#1a1714">
+  <title>{{ block "title" . }}{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}{{ end }}</title>
   {{ with .Description }}<meta name="description" content="{{ . }}">{{ end }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&family=Boldonse&family=Fragment+Mono:ital@0;1&display=swap">
   <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+  <link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
 </head>
 <body>
   <header class="site-header">
-    <a class="site-title" href="{{ "/" | relURL }}">{{ site.Title }}</a>
+    <a class="site-title" href="{{ "/" | relURL }}">Badge Collector<span class="dot">.</span></a>
     <nav>
       {{ range site.Menus.main }}
       <a href="{{ .URL | relURL }}">{{ .Name }}</a>
@@ -20,7 +25,8 @@
     {{ block "main" . }}{{ end }}
   </main>
   <footer class="site-footer">
-    <p>Public badge catalog. Contribute via pull request.</p>
+    <span>Public catalog · made of files · git is the audit log</span>
+    <span><a href="https://github.com/sirmmo/badgecollector">github / sirmmo / badgecollector</a></span>
   </footer>
 </body>
 </html>

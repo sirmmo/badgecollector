@@ -1,6 +1,9 @@
 {{ define "main" }}
-<article class="page">
-  <h1>{{ .Title }}</h1>
-  <div class="content">{{ .Content }}</div>
-</article>
+<section class="page-head">
+  <div>
+    <div class="page-eyebrow">Document</div>
+    <h1 class="page-title">{{ .Title }}</h1>
+  </div>
+</section>
+<article class="badge-meta-val" style="max-width:65ch">{{ .Content }}</article>
 {{ end }}

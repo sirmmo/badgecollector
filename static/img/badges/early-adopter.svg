@@ -1,4 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <circle cx="64" cy="64" r="60" fill="#fff3c4" stroke="#b8860b" stroke-width="3"/>
-  <text x="64" y="72" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" font-weight="700" fill="#7a5a0a">EARLY</text>
+  <defs>
+    <clipPath id="clip-ea"><rect x="8" y="8" width="112" height="112" rx="26"/></clipPath>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="#f4c25c"/>
+  <g clip-path="url(#clip-ea)">
+    <circle cx="64" cy="92" r="32" fill="#f08a4b"/>
+    <path d="M64 40 L70 56 L86 50 L78 64 L94 70 L78 76 L86 90 L70 84 L64 100 L58 84 L42 90 L50 76 L34 70 L50 64 L42 50 L58 56 Z" fill="#fff7e3" opacity="0.95"/>
+  </g>
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="none" stroke="#7a4e0f" stroke-width="3"/>
 </svg>

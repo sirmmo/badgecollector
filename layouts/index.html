@@ -1,23 +1,39 @@
 {{ define "main" }}
 <section class="hero">
-  <h1>{{ site.Title }}</h1>
-  <p class="lede">{{ site.Params.description }}</p>
-  <div class="content">{{ .Content }}</div>
-  <p class="cta">
-    <a href="{{ "/badges/" | relURL }}">Browse badges</a>
-    <a href="{{ "/clients/" | relURL }}">Registered clients</a>
-  </p>
+  <h1 class="hero-mark">Badges,<br>kept<span class="accent">.</span></h1>
+  <p class="hero-tag">A small public catalog where third-party apps quietly pin badges to the people who earned them. Append-only files, git for the audit log, no database, no fuss.</p>
+  <p class="hero-meta">{{ len (where site.RegularPages "Section" "badges") }} badges &nbsp;·&nbsp; {{ len site.Data.clients }} clients &nbsp;·&nbsp; live at badgecollector.org</p>
 </section>
 
 <section class="lookup">
-  <h2>Look up your badges</h2>
-  <p class="lede">Paste the SHA-256 hash of your lowercase email to see what you've been awarded.</p>
+  <p class="lookup-eyebrow">If you've earned something</p>
+  <h2>Find your wall.</h2>
+  <p>Compute the SHA-256 of your lowercase email and paste it below. Your recipient page renders from <code style="font-family:var(--ff-mono); color:var(--citron)">users/manual.csv</code> at build time, no login needed.</p>
   <form id="lookup-form" autocomplete="off">
-    <input type="text" name="hash" id="lookup-hash" pattern="[0-9a-fA-F]{64}" placeholder="64-character hex hash" required>
-    <button type="submit">Look up</button>
+    <input type="text" name="hash" id="lookup-hash" pattern="[0-9a-fA-F]{64}" placeholder="paste 64-char hex hash" required spellcheck="false">
+    <button type="submit">Open wall</button>
   </form>
-  <p class="hint"><small>Compute it yourself: <code>echo -n "you@example.com" | tr A-Z a-z | sha256sum</code></small></p>
+  <p class="hint">Compute it: <code>echo -n "you@example.com" | tr A-Z a-z | sha256sum</code></p>
 </section>
+
+<section class="signposts">
+  <a class="signpost" href="{{ "/badges/" | relURL }}">
+    <span class="signpost-kind">Catalog</span>
+    <span class="signpost-title">All the badges</span>
+    <span class="signpost-desc">Every definition in the collection. Anyone can propose a new one by opening an issue.</span>
+  </a>
+  <a class="signpost" href="{{ "/clients/" | relURL }}">
+    <span class="signpost-kind">Issuers</span>
+    <span class="signpost-title">Registered clients</span>
+    <span class="signpost-desc">Apps allowed to pin badges to people via the relay Worker.</span>
+  </a>
+  <a class="signpost" href="https://github.com/sirmmo/badgecollector#api">
+    <span class="signpost-kind">Build with it</span>
+    <span class="signpost-title">SDKs &amp; API</span>
+    <span class="signpost-desc">JS &amp; Python SDKs. <code style="font-family:var(--ff-mono); color:var(--citron)">POST /award</code> takes a <code style="font-family:var(--ff-mono); color:var(--citron)">bk_…</code> key and an email.</span>
+  </a>
+</section>
+
 <script>
   document.getElementById("lookup-form").addEventListener("submit", function (e) {
     e.preventDefault();
