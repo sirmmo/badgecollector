@@ -1,0 +1,45 @@
+{
+  "name": "badgecollector",
+  "version": "0.1.0",
+  "description": "JS/TS client for badgecollector.org — apify badge assignment via GitHub repository_dispatch or the relay Worker.",
+  "type": "module",
+  "main": "./index.mjs",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "default": "./index.mjs"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "badges",
+    "open-badges",
+    "certifications",
+    "achievements",
+    "github",
+    "cloudflare-workers"
+  ],
+  "author": "Marco Montanari",
+  "license": "MIT",
+  "homepage": "https://badgecollector.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sirmmo/badgecollector.git",
+    "directory": "sdk/js"
+  },
+  "bugs": {
+    "url": "https://github.com/sirmmo/badgecollector/issues"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

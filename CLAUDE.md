@@ -356,12 +356,21 @@ All three award-writing procedures go through `apply-award.mjs`, which appends t
 
 ### Client SDKs
 
-- `sdk/js/index.mjs` — JS/TS/Bun/Deno/Workers/browsers. `awardBadge()`, `hashEmail()`, `awaitAwardCompletion()`.
-- `sdk/python/badgecollector/` — Python 3.8+, stdlib only. Mirrors the JS API.
+- `sdk/js/` — JS/TS/Bun/Deno/Workers/browsers. Published to npm as **`badgecollector`**. `awardBadge()`, `hashEmail()`, `awaitAwardCompletion()`.
+- `sdk/python/` — Python 3.8+, stdlib only. Published to PyPI as **`badgecollector`**. Mirrors the JS API.
 
 Both SDKs accept either auth mode:
 - `apiKey`/`api_key` + `workerUrl`/`worker_url` → relay Worker path (the `bk_*` key the registration workflow emails to integrators).
 - `token` → direct GitHub `repository_dispatch` (PAT with Actions: write on the repo).
+
+### Publishing
+
+Both SDKs publish from CI on a git tag.
+
+- **npm**: tag `js-v0.1.0` (must match `sdk/js/package.json` version). `.github/workflows/publish-npm.yml` runs `npm publish --provenance --access public`. Requires `NPM_TOKEN` repo secret (npm Granular Access Token, "Publish" permission for the `badgecollector` package).
+- **PyPI**: tag `py-v0.1.0` (must match `sdk/python/pyproject.toml` version). `.github/workflows/publish-pypi.yml` uses PyPI trusted publishing (OIDC, no token). Requires a pending publisher configured at <https://pypi.org/manage/account/publishing/> with owner `sirmmo`, repo `badgecollector`, workflow `publish-pypi.yml`, environment `pypi`.
+
+Bump the version in the SDK's manifest, commit, tag with the same version, push the tag. The workflow refuses to publish if tag and manifest disagree.
 
 ### Relay Worker — `worker/`
 
