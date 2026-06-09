@@ -1,0 +1,63 @@
+name: Award a badge (dispatch)
+
+on:
+  repository_dispatch:
+    types: [badge-award]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manual-awards
+  cancel-in-progress: false
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply award
+        id: apply
+        env:
+          REPO_ROOT: ${{ github.workspace }}
+          PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+          SENDER_LOGIN: ${{ github.event.sender.login }}
+        run: |
+          OUTPUT="$(node .github/scripts/dispatch-award.mjs)"
+          echo "$OUTPUT"
+          echo "result<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Annotate failure
+        if: fromJSON(steps.apply.outputs.result).ok == false
+        env:
+          RESULT: ${{ steps.apply.outputs.result }}
+        run: |
+          echo "::error title=Award rejected::$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).errors.join("; ")))')"
+          exit 1
+
+      - name: Commit award
+        if: fromJSON(steps.apply.outputs.result).ok == true
+        env:
+          RESULT: ${{ steps.apply.outputs.result }}
+        run: |
+          DUPLICATE="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(String(JSON.parse(d.toString()).duplicate)))')"
+          if [ "$DUPLICATE" = "true" ]; then
+            echo "Duplicate award, no commit needed."
+            exit 0
+          fi
+          BADGE_ID="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).badge_id))')"
+          HASH="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).email_hash))')"
+          STUB_PATH="$(echo "$RESULT" | node -e 'process.stdin.on("data",d=>process.stdout.write(JSON.parse(d.toString()).stub_path || ""))')"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add users/manual.csv
+          if [ -n "$STUB_PATH" ]; then
+            git add "$STUB_PATH"
+          fi
+          git commit -m "Award ${BADGE_ID} to ${HASH:0:12}... (dispatch)" -m "Sender: ${{ github.event.sender.login }}"
+          git push

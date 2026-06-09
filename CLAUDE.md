@@ -293,9 +293,9 @@ Pages built from the file tree:
 
 Implementation note: `/a/...` and `/u/...` pages are generated at build time from the JSON files. Each award commit triggers a rebuild. For the MVP this is fine. If award volume grows, switch the user-page layer to a Worker-rendered route that reads JSON live (Hugo still owns badge pages and chrome).
 
-## Issue-driven workflows
+## Issue-driven and dispatch-driven workflows
 
-Two GitHub Issue Forms back two Actions, giving a no-Worker path for both badge definition and manual awarding.
+Three entry points share the same award-application core (`apply-award.mjs`): badge definition (PR), manual award via issue (UI), and programmatic award via `repository_dispatch` (API).
 
 ### Procedure 1 — Define a badge
 
@@ -304,14 +304,45 @@ Two GitHub Issue Forms back two Actions, giving a no-Worker path for both badge 
 - Behavior: parses the issue body, validates fields, generates `content/badges/{id}.md`, opens a PR for maintainer review, comments back with success/error.
 - Authority: anyone can open the issue; merging the PR is the human gate.
 
-### Procedure 2 — Manually award a badge
+### Procedure 2 — Manually award a badge (issue UI)
 
 - Form: `.github/ISSUE_TEMPLATE/award-badge.yml` (labelled `badge-award`).
 - Action: `.github/workflows/award-badge.yml` triggers on `issues.opened` / `issues.labeled` with that label.
 - Authority gate: only `OWNER`, `MEMBER`, or `COLLABORATOR` can trigger the write; other authors get a comment explaining a maintainer must approve.
 - Inputs: `badge_id`, `email_hash` (64 hex), `expires_at` (optional ISO 8601), `evidence` (optional URL).
-- Behavior: validates inputs, appends a row to `users/manual.csv` (idempotent on `(email_hash, badge_id)` unless the badge is `repeatable`), creates `content/m/{email_hash}.md` stub if it doesn't yet exist, commits to `main`, closes the issue.
-- The submitter is responsible for computing `email_hash = sha256(lowercase(nfc(email)))` themselves. The raw email never appears in the issue, the workflow, or the repo.
+- Behavior: parses the issue, delegates to `apply-award.mjs`, commits, closes the issue. `issued_by` = `gh:{actor}`.
+
+### Procedure 3 — Programmatic award (repository_dispatch)
+
+The "API" surface. No Worker required.
+
+- Action: `.github/workflows/dispatch-award.yml` triggers on `repository_dispatch` with `event_type: badge-award`.
+- Authority gate: GitHub auth — any token with `Actions: write` (`repo` scope on a classic PAT, or a fine-grained PAT with this repo allowlisted) can fire it. Distribute per-client tokens for revocability.
+- Payload (`client_payload`): `{ badge_id, email_hash, expires_at?, evidence?, client_id? }`. `client_id` is self-reported attribution — fine-grained PATs are the trust boundary.
+- Behavior: validates, delegates to `apply-award.mjs`, commits. `issued_by` = `client:{client_id}` if supplied, else `gh:{sender}`.
+
+#### SDK
+
+`sdk/js/index.mjs` — dependency-free JS client. Works in Node 18+, Bun, Deno, browsers, Cloudflare Workers (Node 16 via `opts.fetch`).
+
+```js
+import { awardBadge, hashEmail } from "https://raw.githubusercontent.com/sirmmo/badgecollector/main/sdk/js/index.mjs";
+
+const result = await awardBadge({
+  token: process.env.GH_TOKEN,
+  badge_id: "early-adopter",
+  email: "user@example.com",          // hashed locally; never sent
+  expires_at: "2027-06-09T00:00:00Z", // optional
+  client_id: "acme-corp",             // optional attribution
+});
+// → { ok: true, email_hash, badge_id, recipient_page: "https://badgecollector.org/m/.../", accepted_at }
+```
+
+For synchronous confirmation, `awaitAwardCompletion({ token, triggeredAt: result.accepted_at })` polls the workflow runs API.
+
+### Shared award core — `users/manual.csv`
+
+All three procedures that write awards go through `apply-award.mjs`, which appends to `users/manual.csv` and creates the recipient stub. Single source of truth, single set of validation rules.
 
 ### Reserved `manual` client
 
