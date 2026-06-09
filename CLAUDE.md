@@ -356,8 +356,27 @@ All three award-writing procedures go through `apply-award.mjs`, which appends t
 
 ### Client SDKs
 
-- `sdk/js/index.mjs` — JS/TS/Bun/Deno/Workers/browsers. `awardBadge()`, `hashEmail()`, `awaitAwardCompletion()`. Auth: GitHub PAT (today, via dispatch) → swap to `bk_*` once the relay Worker is live.
-- `sdk/python/badgecollector/` — Python 3.8+, stdlib only. Mirrors the JS API: `award_badge()`, `hash_email()`, `await_award_completion()`.
+- `sdk/js/index.mjs` — JS/TS/Bun/Deno/Workers/browsers. `awardBadge()`, `hashEmail()`, `awaitAwardCompletion()`.
+- `sdk/python/badgecollector/` — Python 3.8+, stdlib only. Mirrors the JS API.
+
+Both SDKs accept either auth mode:
+- `apiKey`/`api_key` + `workerUrl`/`worker_url` → relay Worker path (the `bk_*` key the registration workflow emails to integrators).
+- `token` → direct GitHub `repository_dispatch` (PAT with Actions: write on the repo).
+
+### Relay Worker — `worker/`
+
+A Cloudflare Worker that turns per-integrator `bk_*` keys into a single GitHub auth surface so integrators never see a GitHub token.
+
+- Endpoint: `POST /award` with `Authorization: Bearer bk_*`. Body: `{ badge_id, email|email_hash, expires_at?, evidence? }`.
+- Lookup: SHA-256 of the bearer token is matched against `api_key_hash` in `data/clients/*.yaml`. The client list is fetched via GitHub contents API and cached in module scope for `CLIENT_CACHE_TTL_MS` (default 60s).
+- On match: fires the same `repository_dispatch` (`event_type: badge-award`) the SDK direct path uses, with `client_id` set from the matched YAML.
+- Auth to GitHub: `GH_BOT_PAT` Worker secret (fine-grained PAT scoped to this repo, Actions: write + Contents: read).
+- CORS: `*` on the `/award` endpoint so browser apps can call it directly.
+- `GET /healthz` reports cache age and cached client count.
+
+Deploy: `.github/workflows/deploy-worker.yml` runs `wrangler deploy` on pushes that touch `worker/**`. Requires repo secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. The `GH_BOT_PAT` secret is set on the Worker side via `wrangler secret put GH_BOT_PAT` (not stored in GitHub).
+
+Until DNS is added for `api.badgecollector.org`, the service is reachable at `https://badgecollector-worker.<account>.workers.dev`.
 
 ### Reserved `manual` client
 

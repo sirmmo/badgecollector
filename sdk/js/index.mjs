@@ -44,32 +44,38 @@ export async function hashEmail(email) {
 }
 
 /**
- * Award a badge by firing a repository_dispatch event on the badgecollector
- * repo. Returns once GitHub has accepted the event (HTTP 204); the workflow
- * runs asynchronously a few seconds later.
+ * Award a badge. Two auth modes:
+ *
+ *  - **Worker path** (recommended): pass `apiKey` (a `bk_*` key minted by
+ *    the register-client workflow) and `workerUrl`. The Worker validates
+ *    the key against the repo's client YAMLs and fires the dispatch with
+ *    correct `client_id` attribution. Single credential per integrator.
+ *
+ *  - **Direct dispatch**: pass `token` (a GitHub PAT with Actions:write
+ *    on the repo). Self-reports `client_id` for attribution.
+ *
+ * Either path returns once the upstream accepts the request; the
+ * dispatch-award workflow runs asynchronously a few seconds later.
  *
  * @param {{
- *   token: string,                  // PAT or installation token with Actions:write (Contents:read) on the repo
- *   badge_id: string,               // must exist in content/badges/{badge_id}.md
- *   email?: string,                 // raw email — hashed locally; never sent
- *   email_hash?: string,            // alternatively, a pre-computed sha256(lowercase(nfc(email)))
- *   expires_at?: string|null,       // optional ISO 8601 datetime
- *   evidence?: string|null,         // optional URL
- *   client_id?: string,             // optional self-reported attribution; ends up as issued_by="client:<id>"
- *   owner?: string,                 // defaults to sirmmo
- *   repo?: string,                  // defaults to badgecollector
- *   fetch?: typeof fetch,           // override for Node <18
- * }} opts
- * @returns {Promise<{
- *   ok: true,
- *   email_hash: string,
+ *   apiKey?: string,
+ *   workerUrl?: string,
+ *   token?: string,
  *   badge_id: string,
- *   recipient_page: string,
- *   accepted_at: string,
- * }>}
+ *   email?: string,
+ *   email_hash?: string,
+ *   expires_at?: string|null,
+ *   evidence?: string|null,
+ *   client_id?: string,
+ *   owner?: string,
+ *   repo?: string,
+ *   fetch?: typeof fetch,
+ * }} opts
  */
 export async function awardBadge(opts = {}) {
   const {
+    apiKey,
+    workerUrl,
     token,
     badge_id,
     email,
@@ -81,10 +87,18 @@ export async function awardBadge(opts = {}) {
     fetch: fetchFn,
   } = opts;
 
-  if (!token) throw new Error("awardBadge: token is required");
   if (!badge_id) throw new Error("awardBadge: badge_id is required");
   if (!email && !opts.email_hash) {
     throw new Error("awardBadge: pass either email or email_hash");
+  }
+  if (apiKey && token) {
+    throw new Error("awardBadge: pass apiKey OR token, not both");
+  }
+  if (!apiKey && !token) {
+    throw new Error("awardBadge: pass apiKey (with workerUrl) or token");
+  }
+  if (apiKey && !workerUrl) {
+    throw new Error("awardBadge: workerUrl is required when apiKey is set");
   }
 
   const email_hash = (opts.email_hash || (await hashEmail(email))).toLowerCase();
@@ -103,6 +117,30 @@ export async function awardBadge(opts = {}) {
     throw new Error("awardBadge: fetch is not available; pass opts.fetch on Node <18");
   }
 
+  if (apiKey) {
+    const res = await fetchImpl(`${workerUrl.replace(/\/$/, "")}/award`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "User-Agent": "badgecollector-client",
+      },
+      body: JSON.stringify({
+        badge_id,
+        email_hash,
+        ...(expires_at ? { expires_at } : {}),
+        ...(evidence ? { evidence } : {}),
+      }),
+    });
+    if (!res.ok) {
+      let detail = "";
+      try { detail = JSON.stringify(await res.json()); } catch { detail = await res.text().catch(() => ""); }
+      throw new Error(`awardBadge: Worker ${res.status} ${res.statusText}: ${detail}`);
+    }
+    const out = await res.json();
+    return { ...out, accepted_at: out.accepted_at || new Date().toISOString() };
+  }
+
   const client_payload = {
     badge_id,
     email_hash,
@@ -110,7 +148,6 @@ export async function awardBadge(opts = {}) {
     ...(evidence ? { evidence } : {}),
     ...(client_id ? { client_id } : {}),
   };
-
   const res = await fetchImpl(`https://api.github.com/repos/${owner}/${repo}/dispatches`, {
     method: "POST",
     headers: {
@@ -122,12 +159,10 @@ export async function awardBadge(opts = {}) {
     },
     body: JSON.stringify({ event_type: EVENT_TYPE, client_payload }),
   });
-
   if (res.status !== 204) {
     const text = await res.text().catch(() => "");
     throw new Error(`awardBadge: GitHub API ${res.status} ${res.statusText}: ${text}`);
   }
-
   return {
     ok: true,
     email_hash,

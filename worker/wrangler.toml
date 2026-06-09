@@ -1,0 +1,19 @@
+name = "badgecollector-worker"
+main = "src/index.js"
+compatibility_date = "2026-05-07"
+
+# Secrets to set out-of-band via `wrangler secret put`:
+#   GH_BOT_PAT  fine-grained PAT scoped to sirmmo/badgecollector with
+#               Actions: write (Contents: read for the contents API).
+#
+# Custom domain (api.badgecollector.org) deferred — service is reachable
+# at https://badgecollector-worker.<account>.workers.dev/award until DNS
+# is added in the Cloudflare dashboard.
+
+[vars]
+GH_REPO = "sirmmo/badgecollector"
+DISPATCH_EVENT_TYPE = "badge-award"
+CLIENT_CACHE_TTL_MS = "60000"
+
+[observability]
+enabled = true

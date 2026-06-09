@@ -113,10 +113,12 @@ def _get_json(url: str, token: str) -> Any:
 
 def award_badge(
     *,
-    token: str,
     badge_id: str,
     email: Optional[str] = None,
     email_hash: Optional[str] = None,
+    api_key: Optional[str] = None,
+    worker_url: Optional[str] = None,
+    token: Optional[str] = None,
     expires_at: Optional[str] = None,
     evidence: Optional[str] = None,
     client_id: Optional[str] = None,
@@ -124,22 +126,32 @@ def award_badge(
     repo: str = DEFAULT_REPO,
 ) -> Dict[str, Any]:
     """
-    Award a badge by firing a ``repository_dispatch`` event. Returns once
-    GitHub has accepted the event (HTTP 204); the workflow runs a few
-    seconds later.
+    Award a badge. Two auth modes:
 
-    Either ``email`` (hashed locally; never sent) or ``email_hash`` (a
-    pre-computed sha256 hex) must be provided.
+    * **Worker path** (recommended): pass ``api_key`` (a ``bk_*`` key
+      minted by the register-client workflow) and ``worker_url``. The
+      Worker validates the key and fires the dispatch.
 
-    :raises AwardError: on GitHub API rejection.
+    * **Direct dispatch**: pass ``token`` (a GitHub PAT with
+      Actions:write on the repo). Self-reports ``client_id`` for
+      attribution.
+
+    Either ``email`` (hashed locally; never sent) or ``email_hash``
+    (a pre-computed sha256 hex) must be provided.
+
+    :raises AwardError: on upstream rejection.
     :raises ValueError: on invalid input.
     """
-    if not token:
-        raise ValueError("token is required")
     if not badge_id:
         raise ValueError("badge_id is required")
     if not email and not email_hash:
         raise ValueError("pass either email or email_hash")
+    if api_key and token:
+        raise ValueError("pass api_key OR token, not both")
+    if not api_key and not token:
+        raise ValueError("pass api_key (with worker_url) or token")
+    if api_key and not worker_url:
+        raise ValueError("worker_url is required when api_key is set")
 
     digest = (email_hash or hash_email(email)).lower()
     if not _HEX64.match(digest):
@@ -153,6 +165,25 @@ def award_badge(
         if dt <= datetime.now(timezone.utc):
             raise ValueError(f"expires_at is in the past: {expires_at}")
 
+    if api_key:
+        body: Dict[str, Any] = {"badge_id": badge_id, "email_hash": digest}
+        if expires_at:
+            body["expires_at"] = expires_at
+        if evidence:
+            body["evidence"] = evidence
+        url = f"{worker_url.rstrip('/')}/award"
+        raw = _post_json(url, body, api_key)
+        try:
+            out = json.loads(raw.decode("utf-8"))
+        except Exception:
+            out = {}
+        out.setdefault("ok", True)
+        out.setdefault("email_hash", digest)
+        out.setdefault("badge_id", badge_id)
+        out.setdefault("recipient_page", f"{RECIPIENT_BASE}/{digest}/")
+        out.setdefault("accepted_at", datetime.now(timezone.utc).isoformat())
+        return out
+
     client_payload: Dict[str, Any] = {"badge_id": badge_id, "email_hash": digest}
     if expires_at:
         client_payload["expires_at"] = expires_at
@@ -163,7 +194,6 @@ def award_badge(
 
     url = f"https://api.github.com/repos/{owner}/{repo}/dispatches"
     _post_json(url, {"event_type": EVENT_TYPE, "client_payload": client_payload}, token)
-
     return {
         "ok": True,
         "email_hash": digest,
