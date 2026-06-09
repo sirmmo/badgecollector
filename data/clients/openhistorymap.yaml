@@ -1,0 +1,9 @@
+id: openhistorymap
+name: "OpenHistoryMap"
+homepage: "https://www.openhistorymap.org"
+owner_contact: "set on registration, not stored"
+api_key_hash: sha256:f9513c53ce20ca5b992ad5b48f1ba8c002e2c6d6382c2b2884b952f4baa1f8a2
+hash_scheme: hmac
+created_at: 2026-06-09
+revoked: false
+schema: 1
