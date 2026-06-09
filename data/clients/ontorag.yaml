@@ -1,0 +1,9 @@
+id: ontorag
+name: "OntoRAG"
+homepage: "https://ontorag.github.io"
+owner_contact: "set on registration, not stored"
+api_key_hash: sha256:d5e62b274b7a5bf73c2ca76e4243aea8266019b24a4471d93571b62f836406df
+hash_scheme: hmac
+created_at: 2026-06-09
+revoked: false
+schema: 1
