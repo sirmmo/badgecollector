@@ -1,0 +1,9 @@
+id: openfantasymap
+name: "OpenFantasyMap"
+homepage: "https://www.fantasymaps.org"
+owner_contact: "set on registration, not stored"
+api_key_hash: sha256:169c6806dbf499ab5ec3af1b236cf3195cb5230e2e520185d0d9fe8c810694d6
+hash_scheme: hmac
+created_at: 2026-06-09
+revoked: false
+schema: 1
