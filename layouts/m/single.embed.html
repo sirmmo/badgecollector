@@ -5,11 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Badges</title>
   <base target="_top">
+  <script>
+    (function () {
+      try {
+        var p = new URLSearchParams(location.search).get("theme");
+        if (p === "light" || p === "dark") document.documentElement.setAttribute("data-theme", p);
+      } catch (e) {}
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;600&family=Boldonse&family=Fragment+Mono&display=swap">
   <style>
     :root {
+      color-scheme: dark light;
+
       --bg-card: oklch(22% 0.020 40);
       --bg-deep: oklch(14% 0.013 40);
       --hairline: oklch(32% 0.025 40);
@@ -19,9 +29,52 @@
       --coral: oklch(75% 0.20 30);
       --citron: oklch(85% 0.18 100);
       --gold: oklch(82% 0.16 78);
+      --press: oklch(0% 0 0 / 0.4);
+
       --ff-display: "Boldonse", "Arial Black", system-ui, sans-serif;
       --ff-body: "Albert Sans", -apple-system, system-ui, sans-serif;
       --ff-mono: "Fragment Mono", ui-monospace, monospace;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        color-scheme: light dark;
+        --bg-card: oklch(99% 0.008 70);
+        --bg-deep: oklch(93% 0.014 70);
+        --hairline: oklch(85% 0.013 60);
+        --fg: oklch(22% 0.025 30);
+        --fg-mute: oklch(42% 0.022 35);
+        --fg-dim: oklch(58% 0.018 35);
+        --coral: oklch(58% 0.22 30);
+        --citron: oklch(58% 0.18 95);
+        --gold: oklch(55% 0.16 75);
+        --press: oklch(20% 0.02 30 / 0.18);
+      }
+    }
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg-card: oklch(99% 0.008 70);
+      --bg-deep: oklch(93% 0.014 70);
+      --hairline: oklch(85% 0.013 60);
+      --fg: oklch(22% 0.025 30);
+      --fg-mute: oklch(42% 0.022 35);
+      --fg-dim: oklch(58% 0.018 35);
+      --coral: oklch(58% 0.22 30);
+      --citron: oklch(58% 0.18 95);
+      --gold: oklch(55% 0.16 75);
+      --press: oklch(20% 0.02 30 / 0.18);
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg-card: oklch(22% 0.020 40);
+      --bg-deep: oklch(14% 0.013 40);
+      --hairline: oklch(32% 0.025 40);
+      --fg: oklch(96% 0.015 60);
+      --fg-mute: oklch(72% 0.020 40);
+      --fg-dim: oklch(56% 0.018 40);
+      --coral: oklch(75% 0.20 30);
+      --citron: oklch(85% 0.18 100);
+      --gold: oklch(82% 0.16 78);
+      --press: oklch(0% 0 0 / 0.4);
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; background: transparent; color: var(--fg); font-family: var(--ff-body); }
@@ -54,7 +107,7 @@
         var(--bg-deep);
       border-bottom: 1px solid var(--hairline);
     }
-    .chip-art img { width: 60%; max-width: 64px; filter: drop-shadow(0 4px 10px oklch(0% 0 0 / 0.4)); }
+    .chip-art img { width: 60%; max-width: 64px; filter: drop-shadow(0 4px 10px var(--press)); }
     .chip-body { padding: 10px; display: flex; flex-direction: column; gap: 4px; }
     .chip-name {
       font-family: var(--ff-display);

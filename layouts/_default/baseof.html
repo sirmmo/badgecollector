@@ -3,9 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1a1714">
+  <meta name="theme-color" content="#1a1714" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f5f0e8" media="(prefers-color-scheme: light)">
   <title>{{ block "title" . }}{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}{{ end }}</title>
   {{ with .Description }}<meta name="description" content="{{ . }}">{{ end }}
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("bc-theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&family=Boldonse&family=Fragment+Mono:ital@0;1&display=swap">
@@ -19,6 +28,10 @@
       {{ range site.Menus.main }}
       <a href="{{ .URL | relURL }}">{{ .Name }}</a>
       {{ end }}
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Toggle theme">
+        <span data-theme-shown="dark">Lights on</span>
+        <span data-theme-shown="light">Lights off</span>
+      </button>
     </nav>
   </header>
   <main>
@@ -28,5 +41,30 @@
     <span>Public catalog · made of files · git is the audit log</span>
     <span><a href="https://github.com/sirmmo/badgecollector">github / sirmmo / badgecollector</a></span>
   </footer>
+  <script>
+    (function () {
+      var ROOT = document.documentElement;
+      function effective() {
+        var attr = ROOT.getAttribute("data-theme");
+        if (attr === "light" || attr === "dark") return attr;
+        return matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+      function sync() {
+        var e = effective();
+        document.querySelectorAll("[data-theme-shown]").forEach(function (n) {
+          n.hidden = n.getAttribute("data-theme-shown") !== e;
+        });
+      }
+      sync();
+      var btn = document.getElementById("theme-toggle");
+      btn && btn.addEventListener("click", function () {
+        var next = effective() === "dark" ? "light" : "dark";
+        ROOT.setAttribute("data-theme", next);
+        try { localStorage.setItem("bc-theme", next); } catch (e) {}
+        sync();
+      });
+      matchMedia("(prefers-color-scheme: light)").addEventListener("change", sync);
+    })();
+  </script>
 </body>
 </html>
