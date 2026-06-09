@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="{{ site.LanguageCode | default "en" }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Badges</title>
+  <base target="_top">
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:transparent;color:#1a1a1a;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+    body{padding:.75rem}
+    .bc-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.75rem}
+    .bc-badge{display:flex;flex-direction:column;align-items:center;text-align:center;padding:.5rem;border:1px solid #e3e3dd;border-radius:8px;background:#fff;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+    .bc-badge:hover{border-color:#2547d0;transform:translateY(-1px)}
+    .bc-badge.bc-expired,.bc-badge.bc-revoked{opacity:.45;filter:grayscale(.7)}
+    .bc-badge img{width:48px;height:48px;display:block}
+    .bc-badge .bc-name{font-size:.78rem;font-weight:600;margin-top:.4rem;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .bc-badge .bc-status{font-size:.65rem;color:#9a3434;margin-top:.15rem;text-transform:uppercase;letter-spacing:.03em}
+    .bc-empty{font-size:.85rem;color:#6a6a6a;margin:0}
+    .bc-attr{margin:.75rem 0 0;font-size:.7rem;color:#9a9a95;text-align:right}
+    .bc-attr a{color:inherit;text-decoration:none;border-bottom:1px dotted #b8b8b3}
+    .bc-attr a:hover{color:#2547d0}
+    @media(prefers-color-scheme:dark){
+      html,body{color:#e8e8e6}
+      .bc-badge{background:#1f1f1f;border-color:#3a3a3a}
+      .bc-badge:hover{border-color:#9aaef5}
+      .bc-attr{color:#6a6a6a}
+      .bc-attr a{border-bottom-color:#4a4a4a}
+    }
+  </style>
+</head>
+<body>
+  {{ $hash := .Params.email_hash }}
+  {{ $rows := slice }}
+  {{ with try (os.ReadFile "users/manual.csv") }}
+    {{ with .Value }}
+      {{ $lines := split (strings.TrimSpace .) "\n" }}
+      {{ range $i, $line := $lines }}
+        {{ if gt $i 0 }}
+          {{ $v := split $line "," }}
+          {{ if eq (index $v 0) $hash }}
+            {{ $rows = $rows | append (dict
+              "badge_id"   (index $v 1)
+              "awarded_at" (index $v 2)
+              "expires_at" (index $v 3)
+              "issued_by"  (index $v 4)
+              "revoked_at" (index $v 6 | default "")
+            ) }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{ $now := now.Format "2006-01-02T15:04:05Z07:00" }}
+  {{ if $rows }}
+  <div class="bc-wrap">
+    {{ range $rows }}
+      {{ $badgePage := site.GetPage (printf "/badges/%s" .badge_id) }}
+      {{ $expired := and .expires_at (lt .expires_at $now) }}
+      {{ $revoked := ne .revoked_at "" }}
+      {{ $href := cond (eq $badgePage nil) "#" $badgePage.RelPermalink }}
+      <a class="bc-badge{{ if $expired }} bc-expired{{ end }}{{ if $revoked }} bc-revoked{{ end }}" href="{{ printf "https://badgecollector.org%s" $href }}" title="{{ if $badgePage }}{{ $badgePage.Params.description }}{{ else }}{{ .badge_id }}{{ end }}{{ if .expires_at }} (expires {{ .expires_at }}){{ end }}">
+        {{ with $badgePage }}
+          {{ with .Params.image }}<img src="{{ printf "https://badgecollector.org/%s" (strings.TrimPrefix "/" .) }}" alt="">{{ end }}
+          <span class="bc-name">{{ .Params.name | default .Title }}</span>
+        {{ else }}
+          <span class="bc-name">{{ .badge_id }}</span>
+        {{ end }}
+        {{ if $revoked }}<span class="bc-status">revoked</span>{{ else if $expired }}<span class="bc-status">expired</span>{{ end }}
+      </a>
+    {{ end }}
+  </div>
+  {{ else }}
+    <p class="bc-empty">No badges yet.</p>
+  {{ end }}
+  <p class="bc-attr"><a href="https://badgecollector.org/m/{{ $hash }}/">View on Badge Collector</a></p>
+
+  <script>
+    (function () {
+      function sendHeight() {
+        try {
+          parent.postMessage({
+            type: "badgecollector:resize",
+            hash: "{{ $hash }}",
+            height: document.documentElement.scrollHeight
+          }, "*");
+        } catch (e) {}
+      }
+      window.addEventListener("load", sendHeight);
+      new ResizeObserver(sendHeight).observe(document.body);
+    })();
+  </script>
+</body>
+</html>

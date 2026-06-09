@@ -59,5 +59,24 @@
       <p>No awards found for this recipient yet.</p>
     {{ end }}
   </div>
+
+  <section class="embed-help">
+    <h2>Embed</h2>
+    <p>Paste this anywhere to show this recipient's badges:</p>
+    <pre><code id="embed-snippet">&lt;iframe src=&quot;https://badgecollector.org/m/{{ $hash }}/embed.html&quot; width=&quot;100%&quot; height=&quot;160&quot; frameborder=&quot;0&quot; loading=&quot;lazy&quot; title=&quot;Badges&quot;&gt;&lt;/iframe&gt;</code></pre>
+    <button type="button" id="embed-copy">Copy snippet</button>
+    <p><a href="{{ printf "/m/%s/embed.html" $hash | relURL }}">Preview the embed</a>. The page sends <code>postMessage({type:"badgecollector:resize", height})</code> so the host can auto-size the iframe.</p>
+    <script>
+      document.getElementById("embed-copy").addEventListener("click", function () {
+        var text = document.getElementById("embed-snippet").textContent;
+        navigator.clipboard.writeText(text).then(function () {
+          var b = document.getElementById("embed-copy");
+          var t = b.textContent;
+          b.textContent = "Copied";
+          setTimeout(function () { b.textContent = t; }, 1500);
+        });
+      });
+    </script>
+  </section>
 </article>
 {{ end }}

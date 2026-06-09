@@ -75,3 +75,10 @@ code { background: rgba(0,0,0,0.05); padding: 0.1em 0.35em; border-radius: 3px; 
 .award-meta { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 0.75rem; margin: 0.75rem 0 0; font-size: 0.85rem; }
 .award-meta dt { color: var(--muted); }
 .award-meta dd { margin: 0; word-break: break-word; }
+
+.embed-help { margin-top: 2.5rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--card-bg); }
+.embed-help h2 { margin-top: 0; }
+.embed-help pre { background: rgba(0,0,0,0.05); padding: 0.75rem; border-radius: var(--radius); overflow-x: auto; font-size: 0.85rem; margin: 0.5rem 0; }
+.embed-help pre code { background: transparent; padding: 0; }
+.embed-help button { padding: 0.4rem 0.85rem; border: 1px solid var(--accent); background: var(--accent); color: white; border-radius: var(--radius); cursor: pointer; font: inherit; font-size: 0.85rem; }
+.embed-help button:hover { filter: brightness(1.08); }

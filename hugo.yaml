@@ -17,3 +17,10 @@ menu:
 
 build:
   writeStats: false
+
+outputFormats:
+  Embed:
+    mediaType: text/html
+    baseName: embed
+    isPlainText: false
+    notAlternative: true
