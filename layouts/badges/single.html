@@ -1,7 +1,7 @@
 {{ define "main" }}
 <article class="badge-detail">
   <header class="badge-header">
-    {{ with .Params.image }}<img src="{{ . | relURL }}" alt="" class="badge-image-large">{{ end }}
+    {{ with .Params.image }}<img src="{{  strings.TrimPrefix "/" . | relURL }}" alt="" class="badge-image-large">{{ end }}
     <div>
       <h1>{{ .Params.name | default .Title }}</h1>
       <p class="lede">{{ .Params.description }}</p>

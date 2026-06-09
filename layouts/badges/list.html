@@ -5,7 +5,7 @@
   <div class="badges-grid">
     {{ range .Pages.ByTitle }}
     <a class="badge-card" href="{{ .RelPermalink }}">
-      {{ with .Params.image }}<img src="{{ . | relURL }}" alt="" class="badge-image">{{ end }}
+      {{ with .Params.image }}<img src="{{  strings.TrimPrefix "/" . | relURL }}" alt="" class="badge-image">{{ end }}
       <h2>{{ .Params.name | default .Title }}</h2>
       <p>{{ .Params.description }}</p>
       {{ with .Params.tags }}
