@@ -1,0 +1,9 @@
+id: demo-client
+name: "Demo Client"
+homepage: ""
+owner_contact: "demo@example.com"
+api_key_hash: sha256:131b946e4ed84338c8d3702ea8b9c2892ab39451e22dbf9c3a5fce3ef45c90a3
+hash_scheme: hmac
+created_at: 2026-06-09
+revoked: false
+schema: 1
