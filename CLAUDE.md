@@ -83,7 +83,7 @@ schema: 1
 ```
 
 Rules:
-- Plaintext API key is **never** stored. The maintainer mints a key with `tools/issue-client.ts`, writes the hash, and delivers the key out-of-band (one time).
+- Plaintext API key is **never** stored. The maintainer mints a key with `tools/issue-client.mjs`, writes the hash, and delivers the key out-of-band (one time).
 - Rotation = generate new key, replace `api_key_hash`, communicate to client. Old key dies on commit.
 - Revocation = set `revoked: true` and commit. Faster than removing the file.
 - `hash_scheme: hmac` (default): user_id → `HMAC-SHA256(USER_ID_HMAC_SECRET, client_id || 0x00 || nfc(user_id))`. Used by all API clients.
@@ -312,8 +312,9 @@ Image is pinned to `hugomods/hugo:exts-0.154.5`. To bump, edit `bin/hugo`.
 
 ## Build & deploy
 
-- Push to `main` → GitHub Action runs Hugo (via the same image) → deploys to Cloudflare Pages.
-- Worker deploys via `wrangler deploy` from `worker/` (separate Action job).
+- Push to `main` → `.github/workflows/deploy-pages.yml` builds Hugo in the pinned Docker image and deploys to GitHub Pages.
+- Pages source must be set to "GitHub Actions" in repo settings. The workflow's `actions/configure-pages` step injects the correct `--baseURL` (e.g. `https://sirmmo.github.io/badgecollector/`) at build time, so the local `hugo.yaml` baseURL is irrelevant for production.
+- Worker deploys via `wrangler deploy` from `worker/` (separate Action job, future).
 - Worker secrets: `GITHUB_TOKEN` (fine-grained PAT, contents: write on this repo), `USER_ID_HMAC_SECRET`, `EMAIL_HMAC_SECRET`, `RESEND_API_KEY` (or chosen provider).
 
 ## Concurrency
@@ -342,7 +343,7 @@ If a client's volume outgrows this, the Worker can buffer awards per-user in a D
 
 1. Hugo skeleton, two example badges, listing + detail templates, client list page.
 2. Issue-driven workflows: define-badge (issue → PR) and award-badge (issue → commit). Self-contained, needs only Actions.
-3. `tools/issue-client.ts` CLI (mints key, writes YAML).
+3. `tools/issue-client.mjs` CLI (mints key, writes YAML).
 4. Worker: `/award` and `/lookup`, with lookup cache and optimistic retry.
 5. GitHub Action for Pages deploy + Worker deploy.
 6. Worker: `/claim/start` and `/claim/verify`, profile pages.
