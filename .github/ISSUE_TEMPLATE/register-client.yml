@@ -1,0 +1,58 @@
+name: Register a Client
+description: Mint a Badge Collector API key for a third-party app. Workflow emails the key to the contact.
+title: "[client] "
+labels: ["client-registration"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Register a new client. A repository collaborator must open or label this issue; the workflow then:
+
+        1. Generates a fresh `bk_*` API key
+        2. Writes `data/clients/{client_id}.yaml` with the key's SHA-256
+        3. Emails the plaintext key to **Contact email**
+
+        The plaintext key is only stored in the email. It cannot be recovered later — rotate with `tools/issue-client.mjs --rotate` if lost.
+  - type: input
+    id: client_id
+    attributes:
+      label: Client ID
+      description: Lowercase letters, digits, dashes. Becomes the YAML filename. Must match `^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$`.
+      placeholder: acme-corp
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: Human-readable display name.
+      placeholder: Acme Corp
+    validations:
+      required: true
+  - type: input
+    id: homepage
+    attributes:
+      label: Homepage
+      description: Public URL for the client. Optional.
+      placeholder: https://acme.example
+    validations:
+      required: false
+  - type: input
+    id: contact_email
+    attributes:
+      label: Contact email
+      description: Where the plaintext API key will be sent. The email is not stored in the repo.
+      placeholder: ops@acme.example
+    validations:
+      required: true
+  - type: dropdown
+    id: hash_scheme
+    attributes:
+      label: Hash scheme
+      description: How user IDs submitted by this client get hashed. Use `hmac` unless you have a specific reason.
+      options:
+        - hmac
+        - email-sha256
+      default: 0
+    validations:
+      required: true

@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "badgecollector"
+version = "0.1.0"
+description = "Apify badge assignment for badgecollector.org via GitHub repository_dispatch."
+readme = false
+requires-python = ">=3.8"
+license = "MIT"
+authors = [{ name = "Marco Montanari" }]
+keywords = ["badges", "github", "open-badges", "certifications"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Homepage = "https://badgecollector.org"
+Source = "https://github.com/sirmmo/badgecollector"
+Issues = "https://github.com/sirmmo/badgecollector/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["badgecollector"]

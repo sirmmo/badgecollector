@@ -340,9 +340,24 @@ const result = await awardBadge({
 
 For synchronous confirmation, `awaitAwardCompletion({ token, triggeredAt: result.accepted_at })` polls the workflow runs API.
 
+### Procedure 4 — Register a client (issue + email)
+
+- Form: `.github/ISSUE_TEMPLATE/register-client.yml` (labelled `client-registration`).
+- Action: `.github/workflows/register-client.yml`.
+- Authority gate: collaborators only.
+- Inputs: `client_id`, `name`, `homepage?`, `contact_email`, `hash_scheme` (`hmac` | `email-sha256`).
+- Behavior: collaborator-gated; mints a `bk_*` key in process memory, writes `data/clients/{client_id}.yaml` with the sha256, emails the plaintext to `contact_email` via Resend, commits the YAML, closes the issue. The plaintext key is never logged, returned in JSON, or committed.
+- Required secrets: `RESEND_API_KEY` and `RESEND_FROM` (e.g. `Badge Collector <noreply@badgecollector.org>`). The Resend "from" domain must be verified before delivery works.
+- The minted `bk_*` key is currently inert — it will become the Bearer token for `https://api.badgecollector.org/award` once the relay Worker (next step) is deployed.
+
 ### Shared award core — `users/manual.csv`
 
-All three procedures that write awards go through `apply-award.mjs`, which appends to `users/manual.csv` and creates the recipient stub. Single source of truth, single set of validation rules.
+All three award-writing procedures go through `apply-award.mjs`, which appends to `users/manual.csv` and creates the recipient stub. Single source of truth, single set of validation rules.
+
+### Client SDKs
+
+- `sdk/js/index.mjs` — JS/TS/Bun/Deno/Workers/browsers. `awardBadge()`, `hashEmail()`, `awaitAwardCompletion()`. Auth: GitHub PAT (today, via dispatch) → swap to `bk_*` once the relay Worker is live.
+- `sdk/python/badgecollector/` — Python 3.8+, stdlib only. Mirrors the JS API: `award_badge()`, `hash_email()`, `await_award_completion()`.
 
 ### Reserved `manual` client
 
