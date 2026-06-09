@@ -1,9 +1,0 @@
-id: acme-corp
-name: Acme Corp
-homepage: https://acme.example
-owner_contact: ops@acme.example
-api_key_hash: sha256:0000000000000000000000000000000000000000000000000000000000000000
-hash_scheme: hmac
-created_at: 2026-05-01
-revoked: false
-schema: 1
