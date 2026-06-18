@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-oclm"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#c96f5a"/>
+  <g clip-path="url(#clip-oclm)">
+    <path d="M62 46 Q44 41 30 47 L30 86 Q44 80 62 85 Z" fill="#fce5dd" stroke="#4a160f" stroke-width="2"/>
+    <path d="M66 46 Q84 41 98 47 L98 86 Q84 80 66 85 Z" fill="#fce5dd" stroke="#4a160f" stroke-width="2"/>
+    <line x1="64" y1="46" x2="64" y2="85" stroke="#4a160f" stroke-width="2"/>
+    <line x1="37" y1="56" x2="56" y2="54" stroke="#4a160f" stroke-width="1.5"/>
+    <line x1="37" y1="64" x2="56" y2="62" stroke="#4a160f" stroke-width="1.5"/>
+    <line x1="37" y1="72" x2="56" y2="70" stroke="#4a160f" stroke-width="1.5"/>
+    <line x1="72" y1="54" x2="91" y2="56" stroke="#4a160f" stroke-width="1.5"/>
+    <line x1="72" y1="62" x2="91" y2="64" stroke="#4a160f" stroke-width="1.5"/>
+    <line x1="72" y1="70" x2="91" y2="72" stroke="#4a160f" stroke-width="1.5"/>
+    <path d="M60 85 L60 102 L64 96 L68 102 L68 85 Z" fill="#4a160f"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#4a160f" stroke-width="3"/>
+</svg>

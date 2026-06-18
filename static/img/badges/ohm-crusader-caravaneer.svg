@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-occv"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#e0a24b"/>
+  <g clip-path="url(#clip-occv)">
+    <path d="M26 102 Q64 92 102 102" fill="none" stroke="#5a3410" stroke-width="2.5" stroke-dasharray="5 5" stroke-linecap="round"/>
+    <rect x="46" y="52" width="36" height="26" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <line x1="46" y1="65" x2="82" y2="65" stroke="#5a3410" stroke-width="1.5"/>
+    <line x1="64" y1="52" x2="64" y2="78" stroke="#5a3410" stroke-width="1.5"/>
+    <line x1="40" y1="82" x2="86" y2="82" stroke="#5a3410" stroke-width="2.5"/>
+    <line x1="46" y1="78" x2="32" y2="74" stroke="#5a3410" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="52" cy="88" r="8" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <circle cx="52" cy="88" r="2.2" fill="#5a3410"/>
+    <circle cx="78" cy="88" r="8" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <circle cx="78" cy="88" r="2.2" fill="#5a3410"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#5a3410" stroke-width="3"/>
+</svg>

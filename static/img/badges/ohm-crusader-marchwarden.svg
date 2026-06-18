@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-ocmw"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#e8d650"/>
+  <g clip-path="url(#clip-ocmw)">
+    <polygon points="44,98 64,54 84,98" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <line x1="64" y1="54" x2="64" y2="98" stroke="#5a4a0f" stroke-width="2"/>
+    <polygon points="60,98 64,80 68,98" fill="#5a4a0f"/>
+    <path d="M64 24 L67.5 35 L79 35 L69.5 42 L73 53 L64 46 L55 53 L58.5 42 L49 35 L60.5 35 Z" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2" stroke-linejoin="round"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#5a4a0f" stroke-width="3"/>
+</svg>

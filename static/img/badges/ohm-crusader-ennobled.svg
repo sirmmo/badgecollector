@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-ocen"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#f0c14b"/>
+  <g clip-path="url(#clip-ocen)">
+    <path d="M40 82 L40 54 L52 70 L64 48 L76 70 L88 54 L88 82 Z" fill="#fff7e3" stroke="#7a4e0f" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="40" y="82" width="48" height="12" fill="#fff7e3" stroke="#7a4e0f" stroke-width="2.5"/>
+    <circle cx="40" cy="52" r="4" fill="#7a4e0f"/>
+    <circle cx="64" cy="46" r="4.5" fill="#7a4e0f"/>
+    <circle cx="88" cy="52" r="4" fill="#7a4e0f"/>
+    <circle cx="52" cy="88" r="2.5" fill="#7a4e0f"/>
+    <circle cx="64" cy="88" r="2.5" fill="#7a4e0f"/>
+    <circle cx="76" cy="88" r="2.5" fill="#7a4e0f"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#7a4e0f" stroke-width="3"/>
+</svg>

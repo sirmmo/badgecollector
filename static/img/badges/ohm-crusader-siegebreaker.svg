@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-ocsb"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#f0a24b"/>
+  <g clip-path="url(#clip-ocsb)">
+    <rect x="34" y="72" width="60" height="30" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <rect x="34" y="64" width="9" height="10" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <rect x="47" y="64" width="9" height="10" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <rect x="85" y="64" width="9" height="10" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <polygon points="60,72 70,90 80,72" fill="#5a3410"/>
+    <rect x="63" y="92" width="7" height="7" fill="#5a3410"/>
+    <rect x="74" y="94" width="6" height="6" fill="#5a3410"/>
+    <circle cx="86" cy="38" r="8" fill="#fff2e0" stroke="#5a3410" stroke-width="2"/>
+    <line x1="70" y1="54" x2="78" y2="46" stroke="#5a3410" stroke-width="2" stroke-linecap="round"/>
+    <line x1="66" y1="46" x2="72" y2="40" stroke="#5a3410" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#5a3410" stroke-width="3"/>
+</svg>

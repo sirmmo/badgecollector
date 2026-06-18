@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-ocmb"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#f4c25c"/>
+  <g clip-path="url(#clip-ocmb)">
+    <rect x="30" y="98" width="68" height="5" fill="#5a4a0f"/>
+    <rect x="34" y="66" width="18" height="32" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="34" y="60" width="6" height="8" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="46" y="60" width="6" height="8" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="76" y="72" width="16" height="26" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="76" y="66" width="5" height="8" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="87" y="66" width="5" height="8" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="55" y="50" width="18" height="48" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="55" y="44" width="6" height="8" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="67" y="44" width="6" height="8" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="61" y="64" width="6" height="10" fill="#5a4a0f"/>
+    <line x1="64" y1="44" x2="94" y2="34" stroke="#5a4a0f" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="90" y1="35" x2="90" y2="48" stroke="#5a4a0f" stroke-width="2"/>
+    <rect x="86" y="48" width="8" height="7" fill="#fff7e3" stroke="#5a4a0f" stroke-width="2"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#5a4a0f" stroke-width="3"/>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <clipPath id="clip-ocf"><path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z"/></clipPath>
+  </defs>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="#ee6f5a"/>
+  <g clip-path="url(#clip-ocf)">
+    <rect x="48" y="50" width="32" height="50" fill="#fce8d4" stroke="#5a1c14" stroke-width="2.5"/>
+    <rect x="48" y="42" width="8" height="10" fill="#fce8d4" stroke="#5a1c14" stroke-width="2.5"/>
+    <rect x="60" y="42" width="8" height="10" fill="#fce8d4" stroke="#5a1c14" stroke-width="2.5"/>
+    <rect x="72" y="42" width="8" height="10" fill="#fce8d4" stroke="#5a1c14" stroke-width="2.5"/>
+    <line x1="64" y1="42" x2="64" y2="22" stroke="#5a1c14" stroke-width="2.5"/>
+    <polygon points="64,23 82,28 64,34" fill="#5a1c14"/>
+    <rect x="60" y="62" width="8" height="12" fill="#5a1c14"/>
+    <path d="M57 100 L57 86 Q57 80 64 80 Q71 80 71 86 L71 100 Z" fill="#5a1c14"/>
+  </g>
+  <path d="M22 14 L106 14 L106 62 Q106 98 64 118 Q22 98 22 62 Z" fill="none" stroke="#5a1c14" stroke-width="3"/>
+</svg>
