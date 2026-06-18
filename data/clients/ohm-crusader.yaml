@@ -1,0 +1,9 @@
+id: ohm-crusader
+name: "OpenHistoryMap Crusader"
+homepage: ""
+owner_contact: "set on registration, not stored"
+api_key_hash: sha256:7974f17d77bdc2e4be9748aa04cfb5f5fae7a2aba09ad911405e9c8842564248
+hash_scheme: hmac
+created_at: 2026-06-18
+revoked: false
+schema: 1
