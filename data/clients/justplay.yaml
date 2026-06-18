@@ -1,0 +1,9 @@
+id: justplay
+name: "JustPlay Bologna"
+homepage: "https://www.justplaybolo.it"
+owner_contact: "set on registration, not stored"
+api_key_hash: sha256:7f1759191b5ddf14e5df3b73743a964ec8ba12ecbb717b478cdc130f74ab9f79
+hash_scheme: hmac
+created_at: 2026-06-18
+revoked: false
+schema: 1
